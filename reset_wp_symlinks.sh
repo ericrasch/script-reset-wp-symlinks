@@ -9,10 +9,10 @@
 #   and re-creates symlinks pointing to the corresponding GitHub repository folders.
 #
 # Author: Eric Rasch
-# GitHub: https://github.com/ericrasch/reset-wp-symlinks
+#   GitHub: https://github.com/ericrasch/reset-wp-symlinks
 # Date Created: 2025-03-07
 # Last Modified: 2025-03-07
-# Version: 1.0.0
+# Version: 1.6.2
 #
 # Usage:
 #   1. Place this script in your working folder (e.g., ~/scripts/).
