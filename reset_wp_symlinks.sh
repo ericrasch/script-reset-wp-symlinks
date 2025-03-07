@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ################################################################################
 # Script Name: reset_wp_symlinks.sh
 #
@@ -37,7 +38,7 @@
 #
 ################################################################################
 
-# Define theme paths (GitHub Source and Local Destination) using arrays; just copy each "$HOME/path..." line and add as many source/destination combos as you need
+# Define theme paths (GitHub Source and Local Destination) using arrays
 GITHUB_THEMES=(
     "$HOME/path/to/github-repo/wp-content/themes/YOUR-THEME"
 )
@@ -45,6 +46,26 @@ GITHUB_THEMES=(
 LOCAL_THEMES=(
     "$HOME/path/to/local-wp-site/app/public/wp-content/themes/YOUR-THEME"
 )
+
+# Ensure the arrays have matching lengths
+if [ "${#GITHUB_THEMES[@]}" -ne "${#LOCAL_THEMES[@]}" ]; then
+    echo "❌ Error: GITHUB_THEMES and LOCAL_THEMES arrays have mismatched lengths."
+    exit 1
+fi
+
+# Ensure at least one valid source directory exists
+valid_source_found=false
+for src in "${GITHUB_THEMES[@]}"; do
+    if [ -d "$src" ]; then
+        valid_source_found=true
+        break
+    fi
+done
+
+if [ "$valid_source_found" = false ]; then
+    echo "❌ Error: No valid source directories found. Exiting."
+    exit 1
+fi
 
 # Function to remove existing theme folder and create symlink
 reset_symlink() {
