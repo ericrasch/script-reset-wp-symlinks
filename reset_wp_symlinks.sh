@@ -49,21 +49,7 @@ LOCAL_THEMES=(
 
 # Ensure the arrays have matching lengths
 if [ "${#GITHUB_THEMES[@]}" -ne "${#LOCAL_THEMES[@]}" ]; then
-    echo "❌ Error: GITHUB_THEMES and LOCAL_THEMES arrays have mismatched lengths."
-    exit 1
-fi
-
-# Ensure at least one valid source directory exists
-valid_source_found=false
-for src in "${GITHUB_THEMES[@]}"; do
-    if [ -d "$src" ]; then
-        valid_source_found=true
-        break
-    fi
-done
-
-if [ "$valid_source_found" = false ]; then
-    echo "❌ Error: No valid source directories found. Exiting."
+    echo "❌ Error: GITHUB_THEMES and LOCAL_THEMES arrays have mismatched lengths. Exiting."
     exit 1
 fi
 
@@ -79,6 +65,14 @@ reset_symlink() {
     # Check if source exists
     if [ ! -d "$src" ]; then
         echo "❌ Source directory does not exist: $src"
+        return
+    fi
+
+    # Ensure LocalWP site exists before proceeding
+    local localwp_root
+    localwp_root=$(echo "$dest" | awk -F"/wp-content" '{print $1}')
+    if [ ! -d "$localwp_root" ]; then
+        echo "❌ LocalWP site not found at: $localwp_root. Skipping symlink creation."
         return
     fi
 
