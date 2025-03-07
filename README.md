@@ -1,7 +1,12 @@
 # **Reset Symlinks for LocalWP**  
 
 ## **Overview**  
-This script automates the process of **resetting symbolic links** for WordPress theme directories in a **LocalWP environment**. Each time you sync down from WP Engine, your theme files may be overwritten. This script ensures that your LocalWP themes always point to their respective **GitHub repositories** by recreating symlinks as needed.  
+This script automates the process of **resetting symbolic links** for WordPress theme directories in a **LocalWP environment**. Each time you sync down from WP Engine, your theme files may be overwritten. This script ensures that your LocalWP themes always point to their respective **GitHub repositories** by recreating symlinks as needed. 
+
+## **Why did I make this?**  
+Since we use [LocalWP](https://localwp.com/) to download and work on our sites locally, I wanted an easy way to link each site's theme folder to its corresponding GitHub repo (which lives in a separate folder path). This script runs through a defined list of LocalWP theme folders, checks them against a matching list of GitHub theme folders, and automatically creates the necessary symlinks.
+
+The end result? You can edit and commit changes directly in your GitHub repo while instantly seeing those updates reflected in your LocalWP site. 🚀
 
 ## **Why Use This Script?**  
 ✔ **Prevents WP Engine sync from overriding symlinks**  
