@@ -20,6 +20,7 @@ set -euo pipefail
 # Default workspace location
 DEFAULT_WORKSPACE="$HOME/Sites/scripts/wp-symlinks"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
 # Colors for output
 GREEN='\033[0;32m'
@@ -93,6 +94,16 @@ main() {
     # Copy essential scripts
     log_info "Copying scripts..."
     
+    # Copy main entry script from root
+    if [[ -f "$ROOT_DIR/wp-symlinks" ]]; then
+        cp "$ROOT_DIR/wp-symlinks" .
+        chmod +x "wp-symlinks"
+        log_success "Copied: wp-symlinks"
+    else
+        log_warning "Main script not found: wp-symlinks"
+    fi
+    
+    # Copy other scripts from scripts directory
     local files_to_copy=(
         "enhanced-reset_wp_symlinks.sh"
         "restore-from-backup.sh"
@@ -116,15 +127,15 @@ main() {
             log_success "Generated personalized symlink-config.json"
         else
             log_warning "Auto-generation failed, using example template"
-            if [[ -f "$SCRIPT_DIR/symlink-config.json.example" ]]; then
-                cp "$SCRIPT_DIR/symlink-config.json.example" "symlink-config.json"
+            if [[ -f "$ROOT_DIR/symlink-config.json.example" ]]; then
+                cp "$ROOT_DIR/symlink-config.json.example" "symlink-config.json"
                 log_success "Created: symlink-config.json (from example)"
             fi
         fi
     else
         # Fallback to example
-        if [[ -f "$SCRIPT_DIR/symlink-config.json.example" ]]; then
-            cp "$SCRIPT_DIR/symlink-config.json.example" "symlink-config.json"
+        if [[ -f "$ROOT_DIR/symlink-config.json.example" ]]; then
+            cp "$ROOT_DIR/symlink-config.json.example" "symlink-config.json"
             log_success "Created: symlink-config.json (from example)"
         fi
     fi
@@ -137,8 +148,8 @@ main() {
     )
     
     for doc in "${docs_to_copy[@]}"; do
-        if [[ -f "$SCRIPT_DIR/$doc" ]]; then
-            cp "$SCRIPT_DIR/$doc" .
+        if [[ -f "$ROOT_DIR/$doc" ]]; then
+            cp "$ROOT_DIR/$doc" .
             log_success "Copied: $doc"
         fi
     done
@@ -154,13 +165,14 @@ This directory contains your active WordPress symlink management tools.
 
 ## Quick Start
 
-1. **Configure your sites**: Edit `symlink-config.json` with your actual site paths
-2. **Test first**: Run `./enhanced-reset_wp_symlinks.sh --dry-run`
-3. **Execute**: Run `./enhanced-reset_wp_symlinks.sh`
+1. **Run the interactive menu**: `./wp-symlinks`
+2. **Or test directly**: `./enhanced-reset_wp_symlinks.sh --dry-run`
+3. **Execute**: `./enhanced-reset_wp_symlinks.sh`
 
 ## Files in this workspace
 
-- `enhanced-reset_wp_symlinks.sh` - Main symlink management script
+- `wp-symlinks` - 🎯 **MAIN ENTRY POINT** (interactive menu)
+- `enhanced-reset_wp_symlinks.sh` - Core symlink management script
 - `restore-from-backup.sh` - Backup restoration utility
 - `generate-config.sh` - Auto-generate personalized configuration
 - `symlink-config.json` - Your site configuration (auto-generated!)
@@ -169,6 +181,10 @@ This directory contains your active WordPress symlink management tools.
 ## Common Commands
 
 ```bash
+# 🎯 Interactive menu (recommended for beginners)
+./wp-symlinks
+
+# Direct commands:
 # Preview what would be done
 ./enhanced-reset_wp_symlinks.sh --dry-run
 

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Reorganized repository structure** - Moved core scripts to `/scripts` subdirectory
+- **Single entry point** - `wp-symlinks` is now the only executable in root directory
+- **Cleaner architecture** - Professional CLI tool organization pattern
+
+### Added
+- **Interactive menu system** (`wp-symlinks`) - Guided workflows for all operations
+- **Repository structure documentation** (`REPOSITORY-STRUCTURE.md`)
+
 ## [2.0.0] - 2025-06-26
 
 ### Added

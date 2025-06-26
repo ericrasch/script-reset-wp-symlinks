@@ -17,50 +17,35 @@ This project provides powerful tools for automating symbolic link management bet
 
 ## **🚀 Quick Setup**
 
-### **1️⃣ Install Dependencies**
-```bash
-brew install jq
-```
-
-### **2️⃣ Set Up Your Workspace**
+### **Super Simple - One Command Start:**
 ```bash
 # Clone or download this repository
 cd script-reset-wp-symlinks
 
-# Create your dedicated workspace (recommended: outside the repo)
-./setup-workspace.sh
+# Install dependency
+brew install jq
 
-# Or specify custom location
-./setup-workspace.sh ~/.wp-symlinks
-./setup-workspace.sh ~/Documents/wp-tools
+# Run the interactive menu (handles everything!)
+./wp-symlinks
 ```
 
-### **3️⃣ Configure Your Sites (Auto-Generated!)**
+**That's it!** The interactive menu guides you through:
+1. ✅ Workspace setup
+2. ✅ Auto-configuration generation  
+3. ✅ Preview and execution
+4. ✅ Backup management
+
+### **Manual Setup (Advanced Users)**
 ```bash
-# Navigate to your workspace
+# Set up workspace manually
+./scripts/setup-workspace.sh ~/Sites/scripts/wp-symlinks
+
+# Navigate to workspace
 cd ~/Sites/scripts/wp-symlinks
 
-# Your configuration was auto-generated during setup!
-# Review what was detected:
-cat symlink-config.json
-
-# Re-generate if you add new sites:
-./generate-config.sh
-
-# Manual editing (optional - auto-detection works great):
-nano symlink-config.json
-```
-
-### **4️⃣ Test and Run**
-```bash
-# Preview what would be done (always run this first!)
+# Preview and run
 ./enhanced-reset_wp_symlinks.sh --dry-run
-
-# Execute symlink creation
 ./enhanced-reset_wp_symlinks.sh
-
-# Interactive mode for ambiguous matches
-./enhanced-reset_wp_symlinks.sh --interactive
 ```
 
 ---
@@ -70,7 +55,8 @@ nano symlink-config.json
 Your workspace will contain:
 ```
 ~/Sites/scripts/wp-symlinks/
-├── enhanced-reset_wp_symlinks.sh    # Main auto-detection script
+├── wp-symlinks                      # 🎯 MAIN ENTRY POINT (interactive menu)
+├── enhanced-reset_wp_symlinks.sh    # Core auto-detection script
 ├── restore-from-backup.sh           # Backup restoration utility
 ├── generate-config.sh               # Auto-generate configuration
 ├── symlink-config.json              # Your personalized configuration (auto-generated!)
@@ -244,9 +230,25 @@ This project is licensed under the **MIT License**. You are free to use, modify,
 
 ## **🎯 Ready to Get Started?**
 
-1. **Install dependencies**: `brew install jq`
-2. **Set up workspace**: `./setup-workspace.sh`
-3. **Test safely**: `./enhanced-reset_wp_symlinks.sh --dry-run`
-4. **Go live**: `./enhanced-reset_wp_symlinks.sh`
+**Just two commands:**
+1. **Install dependency**: `brew install jq`
+2. **Run interactive menu**: `./wp-symlinks`
 
-Transform your LocalWP workflow from manual maintenance to zero-configuration automation! 🚀
+**The menu handles everything else!** Transform your LocalWP workflow from manual maintenance to zero-configuration automation! 🚀
+
+### **Quick Reference Menu:**
+```
+🚀 SETUP
+  1) Set up new workspace (first time)
+  2) Generate/update configuration
+
+📋 DAILY OPERATIONS  
+  3) Run symlink sync (dry-run preview)
+  4) Run symlink sync (execute)
+  5) Interactive mode (for ambiguous matches)
+
+🔧 MANAGEMENT
+  6) View current configuration
+  7) Restore from backup
+  8) View backup list
+```
