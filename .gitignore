@@ -1,2 +1,50 @@
-echo "node_modules/" >> .gitignore
-echo ".DS_Store" >> .gitignore
+# Dependencies
+node_modules/
+
+# System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and Editor Files
+.vscode/
+.idea/
+.history/
+*.swp
+*.swo
+*~
+
+# Configuration Files (may contain sensitive paths)
+symlink-config.json
+
+# Backup Directories
+backups/
+*.backup
+*.bak
+
+# Log Files
+*.log
+logs/
+
+# Temporary Files
+tmp/
+temp/
+.tmp/
+
+# Local Environment Files
+.env
+.env.local
+.env.*.local
+
+# Archive Files
+*.zip
+*.tar.gz
+*.tar.bz2
+*.rar
+
+# User-specific active configuration
+active-reset_wp_symlinks.sh
