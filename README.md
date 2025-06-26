@@ -1,142 +1,255 @@
-# **Reset Symlinks for LocalWP**  
+# **WordPress Symlink Manager for LocalWP**
 
-## **Overview**  
-This script automates the process of **resetting symbolic links** for WordPress theme directories in a **LocalWP environment**. Each time you sync down from WP Engine, your theme files may be overwritten. This script ensures that your LocalWP themes always point to their respective **GitHub repositories** by recreating symlinks as needed. 
+## **Overview**
 
-## **Why did I make this?**  
-Since we use [LocalWP](https://localwp.com/) to download and work on our sites locally, I wanted an easy way to link each site's theme folder to its corresponding GitHub repo (which lives in a separate folder path). This script runs through a defined list of LocalWP theme folders, checks them against a matching list of GitHub theme folders, and automatically creates the necessary symlinks.
+This project provides powerful tools for automating symbolic link management between WordPress themes/plugins in **LocalWP environments** and their corresponding **GitHub repositories**. When WP Engine syncs overwrite your symlinked directories, these scripts ensure your LocalWP sites always point to the correct development repositories.
 
-The end result? You can edit and commit changes directly in your GitHub repo while instantly seeing those updates reflected in your LocalWP site. 🚀
+## **Why Use This Tool?**
 
-## **Why Use This Script?**  
-✔ **Prevents WP Engine sync from overriding symlinks**  
-✔ **Automatically detects and fixes incorrect symlinks**  
-✔ **Ensures consistency between LocalWP and GitHub repo**  
-✔ **Automates tedious manual work**  
-✔ **Supports multiple WordPress installations**  
+✅ **Prevents WP Engine sync from overriding symlinks**  
+✅ **Auto-detects LocalWP sites and GitHub repositories**  
+✅ **Supports themes, plugins, and custom directories**  
+✅ **Creates automatic backups before making changes**  
+✅ **Provides dry-run mode for safe testing**  
+✅ **Eliminates manual array configuration**  
 
 ---
 
-## **How It Works**  
-1. **Checks if the symlink exists and is correct**  
-   - If correct, it **skips re-creation**  
-2. **Detects incorrect symlinks and fixes them**  
-   - If a symlink exists but points to the wrong location, it **removes and replaces it**  
-3. **Handles overwritten theme directories**  
-   - If WP Engine has replaced a symlink with an actual folder, it **removes it and recreates the symlink**  
-4. **Ensures missing directories are created automatically**  
+## **🚀 Quick Setup**
 
----
-
-## **Installation & Setup**  
-### **1️⃣ Save the Script**  
-- Place the script in a directory, e.g., `~/scripts/reset_wp_symlinks.sh`
-- Ensure it has **execute permissions**:
-  ```bash
-  chmod +x ~/scripts/reset_wp_symlinks.sh
-  ```
-
-### **2️⃣ Run the Script Manually**  
+### **Super Simple - One Command Start:**
 ```bash
-~/scripts/reset_wp_symlinks.sh
+# Clone or download this repository
+cd script-reset-wp-symlinks
+
+# Install dependency
+brew install jq
+
+# Run the interactive menu (handles everything!)
+./wp-symlinks
+```
+
+**That's it!** The interactive menu guides you through:
+1. ✅ Workspace setup
+2. ✅ Auto-configuration generation  
+3. ✅ Preview and execution
+4. ✅ Backup management
+
+### **Manual Setup (Advanced Users)**
+```bash
+# Set up workspace manually
+./scripts/setup-workspace.sh ~/Sites/scripts/wp-symlinks
+
+# Navigate to workspace
+cd ~/Sites/scripts/wp-symlinks
+
+# Preview and run
+./enhanced-reset_wp_symlinks.sh --dry-run
+./enhanced-reset_wp_symlinks.sh
 ```
 
 ---
 
-## **Customizing for Your System**  
-To use this script on your own system, you will need to update the following lines in the script:
+## **📁 What Gets Created**
 
-1. **GitHub Repository Paths**  
-   - Update the `GITHUB_THEMES` array to reflect the correct paths to your theme folders inside your **GitHub repository**.
-   ```bash
-   GITHUB_THEMES=(
-       "$HOME/path/to/github-repo/wp-content/themes/YOUR-THEME"
-   )
-   ```
+Your workspace will contain:
+```
+~/Sites/scripts/wp-symlinks/
+├── wp-symlinks                      # 🎯 MAIN ENTRY POINT (interactive menu)
+├── enhanced-reset_wp_symlinks.sh    # Core auto-detection script
+├── restore-from-backup.sh           # Backup restoration utility
+├── generate-config.sh               # Auto-generate configuration
+├── symlink-config.json              # Your personalized configuration (auto-generated!)
+├── backups/                         # Automatic backups directory
+├── WORKSPACE-README.md              # Quick reference guide
+├── setup-aliases.sh                 # Optional shell aliases
+└── documentation files
+```
 
-2. **LocalWP Theme Paths**  
-   - Update the `LOCAL_THEMES` array to point to your LocalWP installation’s **themes folder**.
-   ```bash
-   LOCAL_THEMES=(
-       "$HOME/path/to/local-wp-site/app/public/wp-content/themes/YOUR-THEME"
-   )
-   ```
+## **Key Benefits of This Approach**
 
-3. **If Using a Different Shell**  
-   - If you are using `zsh` instead of `bash`, update alias commands accordingly in `.zshrc` instead of `.bashrc`.
+| Feature | Manual Setup | This Tool |
+|---------|--------------|-----------|
+| **Setup** | Edit script arrays for each site | **Auto-generated configuration** |
+| **New Sites** | Manual array updates | **Automatic discovery & config generation** |
+| **Plugin Support** | Manual path addition | **Auto-detects custom plugins** |
+| **Safety** | No backup system | **Automatic timestamped backups** |
+| **Testing** | No preview option | **Dry-run mode available** |
+| **Maintenance** | High - update paths manually | **Zero - just re-run generator** |
 
 ---
 
-## **Post-Sync Setup: Installing Dependencies**  
-If the **GitHub repository** contains a `package.json` file in the theme directory, you may need to install dependencies before development. This step is **separate from the WPE/LocalWP sync process** and typically only needs to be done once when first downloading the repository.  
+## **🔄 How It Works**
 
-Run the following command inside the GitHub theme directory to install required Node.js packages and rebuild assets:
-```bash
-cd ~/path/to/github-repo/YOUR-THEME-FOLDER
-npm install
-```
-✅ **This ensures that necessary modules, HTML, and CSS are built properly.**  
+### **Auto-Detection Process**
+1. **Reads LocalWP configuration** from `~/Library/Application Support/Local/sites.json`
+2. **Scans GitHub repositories** in `~/Sites/github/wp-*` directories
+3. **Smart matching** between LocalWP sites and GitHub repos
+4. **Generates personalized configuration** automatically during setup
+5. **Discovers themes, plugins, and custom directories** automatically
+6. **Creates backups** before replacing any directories
+7. **Validates and creates symlinks** with comprehensive error checking
 
----
-
-## **Automating the Process**  
-Instead of running this script manually, you can **automate it using different methods**:
-
-### **1️⃣ Auto-Run When WP Engine Syncs (Using `fswatch`)**
-Automatically run the script when WP Engine **syncs down**:
-
-```bash
-fswatch -o "$HOME/path/to/local-wp-site/app/public/wp-content/themes/" | xargs -n1 ~/scripts/reset_wp_symlinks.sh
-```
-✅ **Automatically resets symlinks when LocalWP files change.**  
+### **What Gets Symlinked**
+- ✅ **Custom themes** (auto-detected in `wp-content/themes/`)
+- ✅ **Custom plugins** (excludes common WordPress plugins)
+- ✅ **Custom directories** (like `app_resources`, `lib`, etc.)
+- ✅ **Per-site customization** via configuration overrides
 
 ---
 
-### **2️⃣ Schedule Automatic Execution (Using `cron`)**  
-Run the script **every 10 minutes** to ensure symlinks are always correct:
+## **💡 Advanced Usage**
 
-```bash
-crontab -e
+### **Auto-Generated Configuration**
+The setup automatically generates a personalized `symlink-config.json` based on your actual LocalWP sites and GitHub repositories. For special cases, you can customize it:
+```json
+{
+  "overrides": {
+    "specialsite": {
+      "github_repo": "wp-special-site-repo", 
+      "include_only": ["wp-content/themes/custom-theme"]
+    }
+  },
+  "global_excludes": {
+    "plugins": ["plugin-to-skip"]
+  }
+}
 ```
 
-Add this line to **run the script every 10 minutes**:
+### **Command Line Options**
 ```bash
-*/10 * * * * ~/scripts/reset_wp_symlinks.sh
+# Preview all changes without executing
+./enhanced-reset_wp_symlinks.sh --dry-run
+
+# Interactive mode for ambiguous site matches
+./enhanced-reset_wp_symlinks.sh --interactive
+
+# Use custom configuration file
+./enhanced-reset_wp_symlinks.sh --config my-config.json
+
+# Skip automatic backups
+./enhanced-reset_wp_symlinks.sh --no-backup
+
+# Enable verbose output
+./enhanced-reset_wp_symlinks.sh --verbose
 ```
-✅ **Set it and forget it!**  
 
----
-
-### **3️⃣ Quick Terminal Command (Using an Alias)**
-Create a **shortcut command** for easy manual execution:
-
+### **Configuration Management**
 ```bash
-echo 'alias resetsymlinks="~/scripts/reset_wp_symlinks.sh"' >> ~/.bashrc
+# Re-generate configuration (when you add new sites)
+./generate-config.sh
+
+# View current configuration
+cat symlink-config.json
+```
+
+### **Backup Management**
+```bash
+# View and restore backups interactively
+./restore-from-backup.sh
+
+# Restore specific backup
+./restore-from-backup.sh theme_20250626_143022
+```
+
+### **Convenient Aliases (Optional)**
+```bash
+# Add to your shell profile
+./setup-aliases.sh >> ~/.bashrc
 source ~/.bashrc
+
+# Then use:
+wp-symlinks     # Navigate to workspace
+wp-sync-dry     # Dry run
+wp-sync         # Execute
+wp-restore      # Restore backups
 ```
-Now, simply type:
+
+---
+
+## **🔒 Security & Privacy**
+
+- **Private workspace** - Your real site configurations stay outside the repository
+- **Automatic backups** - Every replaced directory is backed up with timestamps
+- **Dry-run mode** - Preview all changes before execution
+- **Safe for public repos** - No sensitive site information in the repository
+
+---
+
+## **📚 Documentation**
+
+- **[CHANGELOG.md](CHANGELOG.md)** - Version history and feature changes
+- **[MIGRATION.md](MIGRATION.md)** - Upgrade guide from manual arrays to auto-detection
+- **[CLAUDE.md](CLAUDE.md)** - Technical architecture for development
+
+---
+
+## **🆘 Troubleshooting**
+
+### **Sites Not Detected**
+1. Ensure LocalWP sites exist in `~/Local Sites/`
+2. Verify GitHub repos are in `~/Sites/github/` with `wp-content` directories
+3. Use `--interactive` mode for manual selection
+4. Create custom mappings in `symlink-config.json`
+
+### **Missing Dependencies**
 ```bash
-resetsymlinks
+# Install jq for JSON parsing
+brew install jq
 ```
-✅ **Quick & easy manual execution!**  
+
+### **Backup Recovery**
+```bash
+# List all available backups
+./restore-from-backup.sh
+
+# Follow interactive prompts to restore
+```
 
 ---
 
-## **Customization & Expansion**  
-You can **modify this script** to support additional functionality:  
-🛠 **Track plugin folders** in addition to themes.  
-🛠 **Auto-push changes to GitHub** after fixing symlinks.  
-🛠 **Integrate with GitHub Actions** for more automation.  
+## **🚀 Migration from Manual Scripts**
+
+If you're upgrading from manual array-based scripts:
+
+1. **Keep your existing script** - It continues to work
+2. **Set up the enhanced workspace** - `./setup-workspace.sh`
+3. **Test with dry-run** - `./enhanced-reset_wp_symlinks.sh --dry-run`
+4. **Compare results** - Should match your manual configuration
+5. **Switch when confident** - Enhanced script requires zero maintenance
+
+See **[MIGRATION.md](MIGRATION.md)** for detailed upgrade instructions.
 
 ---
 
-## **License**  
-This project is licensed under the **MIT License**. You are free to use, modify, and distribute it as needed. See the `LICENSE.md` file for full details.  
+## **📄 License**
+
+This project is licensed under the **MIT License**. You are free to use, modify, and distribute it as needed. See the [LICENSE](LICENSE) file for full details.
 
 ---
 
-## **Final Thoughts**  
-🔥 This script **saves time** and **ensures consistency** in your LocalWP workflow. By using automation techniques like `fswatch` and `cron`, you can **eliminate manual intervention** and keep your LocalWP sites synced with GitHub effortlessly.  
+## **🎯 Ready to Get Started?**
 
-🎯 **Ready to make WordPress development with Local WP smoother?** Give it a try! 🚀
+**Just two commands:**
+1. **Install dependency**: `brew install jq`
+2. **Run interactive menu**: `./wp-symlinks`
 
+**The menu handles everything else!** Transform your LocalWP workflow from manual maintenance to zero-configuration automation! 🚀
+
+### **Quick Reference Menu:**
+
+```text
+[SETUP]
+  1) Set up new workspace (first time)
+  2) Generate/update configuration
+
+[DAILY OPERATIONS]  
+  3) Run symlink sync (dry-run preview)
+  4) Run symlink sync (execute)
+  5) Interactive mode (for ambiguous matches)
+
+[MANAGEMENT]
+  6) View current configuration
+  7) Restore from backup
+  8) View backup list
+```
