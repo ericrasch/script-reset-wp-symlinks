@@ -237,17 +237,18 @@ This project is licensed under the **MIT License**. You are free to use, modify,
 **The menu handles everything else!** Transform your LocalWP workflow from manual maintenance to zero-configuration automation! 🚀
 
 ### **Quick Reference Menu:**
-```
-🚀 SETUP
+
+```text
+[SETUP]
   1) Set up new workspace (first time)
   2) Generate/update configuration
 
-📋 DAILY OPERATIONS  
+[DAILY OPERATIONS]  
   3) Run symlink sync (dry-run preview)
   4) Run symlink sync (execute)
   5) Interactive mode (for ambiguous matches)
 
-🔧 MANAGEMENT
+[MANAGEMENT]
   6) View current configuration
   7) Restore from backup
   8) View backup list
