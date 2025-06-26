@@ -35,15 +35,13 @@ brew install jq
 3. ✅ Preview and execution
 4. ✅ Backup management
 
-### **Manual Setup (Advanced Users)**
+### **Advanced Direct Usage**
 ```bash
-# Set up workspace manually
+# Set up workspace manually (skip interactive menu)
 ./scripts/setup-workspace.sh ~/Sites/scripts/wp-symlinks
 
-# Navigate to workspace
+# Navigate to workspace and run directly
 cd ~/Sites/scripts/wp-symlinks
-
-# Preview and run
 ./enhanced-reset_wp_symlinks.sh --dry-run
 ./enhanced-reset_wp_symlinks.sh
 ```
@@ -210,13 +208,13 @@ brew install jq
 
 ## **🚀 Migration from Manual Scripts**
 
-If you're upgrading from manual array-based scripts:
+If you have existing manual array-based scripts from version 1.x:
 
-1. **Keep your existing script** - It continues to work
-2. **Set up the enhanced workspace** - `./setup-workspace.sh`
-3. **Test with dry-run** - `./enhanced-reset_wp_symlinks.sh --dry-run`
-4. **Compare results** - Should match your manual configuration
-5. **Switch when confident** - Enhanced script requires zero maintenance
+1. **Save your current configuration** - Note your site paths for reference
+2. **Set up the new workspace** - `./wp-symlinks` → option 1
+3. **Test with dry-run** - Menu option 3 to preview
+4. **Compare results** - Should match or exceed your manual configuration
+5. **Switch completely** - The enhanced script requires zero maintenance
 
 See **[MIGRATION.md](MIGRATION.md)** for detailed upgrade instructions.
 

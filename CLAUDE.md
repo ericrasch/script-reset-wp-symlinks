@@ -4,133 +4,152 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a bash script utility for LocalWP WordPress development that automates the process of resetting symbolic links between WordPress theme/plugin directories and their corresponding GitHub repositories. The project includes both a legacy manual script and an enhanced auto-detection version.
+This is a modern WordPress symlink management tool for LocalWP development environments. It provides intelligent auto-detection of LocalWP sites and GitHub repositories, with automatic configuration generation and comprehensive backup management.
 
-## Core Architecture
+## Current Architecture (v2.0+)
 
-### Enhanced Script (recommended): `enhanced-reset_wp_symlinks.sh`
+### Main Entry Point
+- **`wp-symlinks`** - Interactive menu system that guides users through all operations
+- Single command interface for setup, configuration, execution, and management
 
-- **Auto-Detection**: Reads LocalWP's `sites.json` to discover active sites
-- **Smart Matching**: Automatically matches LocalWP sites to GitHub repositories
-- **Flexible Symlink Discovery**: Auto-detects themes, plugins, and custom directories
-- **Configuration Support**: Optional JSON config file for custom mappings and overrides
-- **Interactive Mode**: Prompts for ambiguous matches when enabled
-- **Dry-Run Mode**: Preview changes without executing them
-
-### Legacy Script: `reset_wp_symlinks.sh` / `active-reset_wp_symlinks.sh`
-
-- **Array-based Configuration**: Uses parallel `GITHUB_THEMES` and `LOCAL_THEMES` arrays
-- **Manual Setup**: Requires hardcoded paths for each site
-- **Single Function**: `reset_symlink()` handles symlink creation and validation
-
-## Key Features
-
-### Enhanced Script Functions
-
-- `get_localwp_sites()`: Parses LocalWP's sites.json configuration
-- `find_github_repos()`: Discovers WordPress repositories in GitHub directory
-- `match_sites_to_repos()`: Smart matching with multiple strategies
-- `discover_symlink_targets()`: Auto-detects themes, plugins, and custom directories
-- `create_symlink()`: Handles symlink creation with comprehensive validation
+### Core Scripts (in `/scripts` directory)
+- **`enhanced-reset_wp_symlinks.sh`** - Main symlink engine with auto-detection
+- **`generate-config.sh`** - Auto-configuration generator using LocalWP's sites.json
+- **`restore-from-backup.sh`** - Interactive backup restoration utility
+- **`setup-workspace.sh`** - Workspace creation and setup
 
 ### Configuration System
+- **Auto-generated config** via LocalWP sites.json parsing and GitHub repo scanning
+- **Smart matching** between LocalWP sites and GitHub repositories  
+- **Optional JSON config** (`symlink-config.json`) for custom overrides
+- **Backup management** with timestamped directory preservation
 
-- JSON-based configuration file support (`symlink-config.json`)
-- Global excludes for common WordPress themes/plugins
-- Site-specific overrides for special cases
-- Auto-detection settings and fallbacks
+## Key Technical Components
+
+### Auto-Detection Engine
+- **LocalWP Integration**: Parses `~/Library/Application Support/Local/sites.json`
+- **GitHub Repository Scanning**: Finds WordPress projects in `~/Sites/github/wp-*`
+- **Smart Matching Algorithm**: Normalizes names to match sites with repositories
+- **Content Discovery**: Auto-detects themes, plugins, and custom directories
+
+### Symlink Management
+- **Validation Layer**: Checks LocalWP site existence and source directory validity
+- **Backup Creation**: Automatic timestamped backups before replacing directories
+- **Path Handling**: Robust support for custom directories (`app_resources`, `lib`, etc.)
+- **Error Recovery**: Comprehensive error handling with rollback capabilities
+
+### User Experience
+- **Interactive Menu**: Clear workflow guidance with colored output
+- **Dry-Run Mode**: Safe preview of all operations before execution
+- **Status Display**: Real-time feedback on operations and configurations
+- **Help System**: Built-in documentation and workflow guidance
 
 ## Development Commands
 
-### Enhanced Script Usage
-
+### Interactive Usage (Recommended)
 ```bash
-# Make script executable
-chmod +x enhanced-reset_wp_symlinks.sh
+# Main interface
+./wp-symlinks
 
-# Preview changes (recommended first run)
-./enhanced-reset_wp_symlinks.sh --dry-run
-
-# Run with auto-detection
-./enhanced-reset_wp_symlinks.sh
-
-# Interactive mode for ambiguous matches
-./enhanced-reset_wp_symlinks.sh --interactive
-
-# Use custom configuration
-./enhanced-reset_wp_symlinks.sh --config custom-config.json
-
-# Get help
-./enhanced-reset_wp_symlinks.sh --help
+# No-color version for compatibility
+./wp-symlinks-nocolor
 ```
 
-### Legacy Script Usage
-
+### Direct Script Access
 ```bash
-# Make script executable
-chmod +x reset_wp_symlinks.sh
+# Auto-detection with dry-run
+./scripts/enhanced-reset_wp_symlinks.sh --dry-run
 
-# Run the script
-./reset_wp_symlinks.sh
+# Generate configuration
+./scripts/generate-config.sh
 
-# Test with bash debug mode
-bash -x reset_wp_symlinks.sh
+# Interactive matching
+./scripts/enhanced-reset_wp_symlinks.sh --interactive
+
+# Backup restoration
+./scripts/restore-from-backup.sh
+
+# Workspace setup
+./scripts/setup-workspace.sh ~/path/to/workspace
+```
+
+### Testing Commands
+```bash
+# Test configuration generation
+./scripts/generate-config.sh /tmp/test-config.json
+
+# Test with specific config
+./scripts/enhanced-reset_wp_symlinks.sh --config /path/to/config.json --dry-run
+
+# Test backup functionality
+./scripts/restore-from-backup.sh
+```
+
+## Configuration Architecture
+
+### Auto-Generated Configuration
+```json
+{
+  "settings": {
+    "github_base": "$HOME/Sites/github",
+    "localwp_base": "$HOME/Local Sites",
+    "auto_detect": true,
+    "interactive_fallback": true
+  },
+  "mappings": [
+    {
+      "localwp_site": "ExampleSite.com",
+      "github_repo": "wp-example-com",
+      "paths": [
+        "wp-content/themes/custom-theme",
+        "wp-content/plugins/custom-plugin"
+      ]
+    }
+  ],
+  "global_excludes": {
+    "themes": ["twentytwentyone", "twentytwentytwo"],
+    "plugins": ["akismet", "hello-dolly", "wordpress-importer"]
+  }
+}
+```
+
+### Workspace Structure
+```
+~/Sites/scripts/wp-symlinks/
+├── wp-symlinks                      # Main menu (copied from repo)
+├── enhanced-reset_wp_symlinks.sh    # Core engine
+├── generate-config.sh               # Config generator  
+├── restore-from-backup.sh           # Backup utility
+├── symlink-config.json              # Auto-generated config
+├── backups/                         # Timestamped backups
+└── documentation files
 ```
 
 ## Dependencies
 
-The enhanced script requires:
+- **jq** - JSON processor for parsing LocalWP configuration and generating configs
+- **bash 4.0+** - For associative arrays and modern shell features
+- **find/grep** - Standard UNIX utilities for file discovery
 
-- `jq` - JSON processor for parsing LocalWP configuration
+## Error Handling Patterns
 
-  ```bash
-  brew install jq
-  ```
+- **Validation First**: All paths and configurations validated before execution
+- **Graceful Degradation**: Falls back to manual configuration if auto-detection fails
+- **Comprehensive Logging**: Color-coded status messages with clear error descriptions
+- **Automatic Backup**: Every directory replacement creates timestamped backup
+- **Interactive Recovery**: Backup restoration with file browser and confirmation
 
-## Customization Points
+## Development Notes
 
-### Enhanced Script
+- **No Legacy Support**: Version 2.0+ is a complete rewrite with no backward compatibility
+- **Terminal Compatibility**: Dual versions (color/no-color) for different terminal environments
+- **Workspace Isolation**: User data completely separated from repository
+- **Auto-Update Safe**: Repository updates don't affect user workspaces
+- **Public Repository Safe**: No sensitive information stored in repository files
 
-- **Configuration File**: Copy `symlink-config.json.example` to `symlink-config.json` and customize
-- **Base Directories**: Modify `GITHUB_BASE` and `LOCALWP_BASE` variables in script
-- **Exclusion Rules**: Add themes/plugins to avoid in configuration file
-- **Matching Logic**: Customize site-to-repo matching strategies in `match_sites_to_repos()`
+## Version History
 
-### Legacy Script
+- **v2.0+**: Current architecture with auto-detection and interactive menu
+- **v1.x**: Deprecated manual array-based configuration (removed from repository)
 
-1. Update `GITHUB_THEMES` array with actual GitHub repository theme paths
-2. Update `LOCAL_THEMES` array with actual LocalWP installation theme paths
-3. Ensure arrays maintain matching indices for corresponding source/destination pairs
-
-## Script Behavior
-
-### Enhanced Script
-
-- **Auto-Discovery**: Automatically finds LocalWP sites and GitHub repositories
-- **Smart Matching**: Uses multiple strategies to match sites to repositories
-- **Plugin Detection**: Automatically detects custom plugins while excluding common WordPress plugins
-- **Validation**: Comprehensive checks for LocalWP site existence, source directories, and symlink states
-- **Interactive Fallback**: Prompts user for ambiguous matches when enabled
-- **Dry-Run Support**: Preview all changes before execution
-
-### Legacy Script
-
-- Skips recreation if symlink already exists and points to correct location
-- Removes and replaces incorrect symlinks
-- Removes actual directories that should be symlinks (WP Engine overwrites)
-- Creates missing parent directories automatically
-- Validates LocalWP site existence before attempting symlink creation
-
-## LocalWP Integration
-
-The enhanced script integrates with LocalWP by:
-
-- Reading `/Users/[username]/Library/Application Support/Local/sites.json`
-- Extracting active site information (name, path, domain)
-- Validating site existence before creating symlinks
-- Supporting LocalWP's directory structure conventions
-
-## Version Information
-
-- Enhanced Script: v2.0 (current recommended version)
-- Legacy Script: v1.7 (maintained for backward compatibility)
+This architecture provides zero-configuration operation while maintaining full customization capabilities for advanced users.

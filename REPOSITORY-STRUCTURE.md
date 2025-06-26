@@ -11,12 +11,13 @@ script-reset-wp-symlinks/
 │   ├── restore-from-backup.sh           # Backup restoration
 │   └── setup-workspace.sh               # Workspace installer
 ├── symlink-config.json.example          # Configuration template
-├── reset_wp_symlinks.sh                 # Legacy script (v1.x)
+├── wp-symlinks-nocolor                  # Terminal compatibility version
 ├── active-reset_wp_symlinks.sh          # User's personal config (gitignored)
 ├── README.md                            # Main documentation
 ├── CHANGELOG.md                         # Version history
 ├── MIGRATION.md                         # Upgrade guide
 ├── CLAUDE.md                            # Technical architecture
+├── REPOSITORY-STRUCTURE.md             # This file
 ├── LICENSE                              # MIT License
 └── .gitignore                           # Excludes sensitive files
 ```

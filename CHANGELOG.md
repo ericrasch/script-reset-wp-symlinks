@@ -11,10 +11,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Reorganized repository structure** - Moved core scripts to `/scripts` subdirectory
 - **Single entry point** - `wp-symlinks` is now the only executable in root directory
 - **Cleaner architecture** - Professional CLI tool organization pattern
+- **Fixed terminal compatibility** - Improved color code handling with `printf`
 
 ### Added
 - **Interactive menu system** (`wp-symlinks`) - Guided workflows for all operations
 - **Repository structure documentation** (`REPOSITORY-STRUCTURE.md`)
+- **Terminal compatibility version** (`wp-symlinks-nocolor`) - For terminals without ANSI support
+
+### Removed
+- **Legacy script** (`reset_wp_symlinks.sh`) - Superseded by enhanced auto-detection
+- **Manual array configuration** - Replaced with intelligent auto-generation
 
 ## [2.0.0] - 2025-06-26
 
