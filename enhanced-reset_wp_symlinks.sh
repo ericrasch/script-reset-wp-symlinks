@@ -38,12 +38,14 @@ DEFAULT_CONFIG="$CONFIG_DIR/symlink-config.json"
 LOCALWP_CONFIG="$HOME/Library/Application Support/Local/sites.json"
 GITHUB_BASE="$HOME/Sites/github"
 LOCALWP_BASE="$HOME/Local Sites"
+BACKUP_DIR="$SCRIPT_DIR/backups"
 
 # Script options
 DRY_RUN=false
 INTERACTIVE=false
 CONFIG_FILE=""
 VERBOSE=false
+CREATE_BACKUPS=true
 
 # Colors for output
 RED='\033[0;31m'
@@ -92,6 +94,7 @@ OPTIONS:
     --interactive, -i    Interactive mode for ambiguous matches
     --config FILE        Use custom configuration file
     --verbose, -v        Enable verbose output
+    --no-backup          Skip creating backups of replaced directories
     --help, -h          Show this help message
 
 EXAMPLES:
@@ -127,6 +130,10 @@ parse_args() {
                 ;;
             --verbose|-v)
                 VERBOSE=true
+                shift
+                ;;
+            --no-backup)
+                CREATE_BACKUPS=false
                 shift
                 ;;
             --help|-h)
@@ -291,6 +298,75 @@ load_config() {
     return 1
 }
 
+# Create backup of directory before replacing
+create_backup() {
+    local source_path="$1"
+    local backup_name="$2"
+    
+    if [[ ! -d "$source_path" ]]; then
+        return 0  # Nothing to backup
+    fi
+    
+    if [[ "$CREATE_BACKUPS" == "false" ]]; then
+        return 0  # Backups disabled
+    fi
+    
+    # Create backup directory if it doesn't exist
+    if [[ ! -d "$BACKUP_DIR" ]]; then
+        mkdir -p "$BACKUP_DIR"
+    fi
+    
+    # Generate timestamp for backup
+    local timestamp=$(date +"%Y%m%d_%H%M%S")
+    local backup_path="$BACKUP_DIR/${backup_name}_${timestamp}"
+    
+    if [[ "$DRY_RUN" == "true" ]]; then
+        log_info "[DRY RUN] Would create backup: $source_path -> $backup_path"
+        return 0
+    fi
+    
+    # Create backup
+    log_info "Creating backup: $backup_path"
+    
+    if cp -R "$source_path" "$backup_path"; then
+        log_success "Backup created successfully"
+        echo "$backup_path"  # Return backup path
+        return 0
+    else
+        log_error "Failed to create backup"
+        return 1
+    fi
+}
+
+# Restore from backup (for undo functionality)
+restore_backup() {
+    local backup_path="$1"
+    local destination="$2"
+    
+    if [[ ! -d "$backup_path" ]]; then
+        log_error "Backup not found: $backup_path"
+        return 1
+    fi
+    
+    log_info "Restoring from backup: $backup_path -> $destination"
+    
+    # Remove current symlink/directory
+    if [[ -L "$destination" ]]; then
+        rm "$destination"
+    elif [[ -d "$destination" ]]; then
+        rm -rf "$destination"
+    fi
+    
+    # Restore backup
+    if cp -R "$backup_path" "$destination"; then
+        log_success "Backup restored successfully"
+        return 0
+    else
+        log_error "Failed to restore backup"
+        return 1
+    fi
+}
+
 # Create symlink with validation
 create_symlink() {
     local src="$1"
@@ -343,10 +419,27 @@ create_symlink() {
             fi
         fi
     elif [[ -d "$dest" ]]; then
+        # Create backup before removing directory
+        local backup_name=$(basename "$dest")
+        local site_name=$(echo "$dest" | grep -o '[^/]*\.com\|[^/]*\.org' | head -1 | sed 's/\./_/g')
+        if [[ -n "$site_name" ]]; then
+            backup_name="${site_name}_${backup_name}"
+        fi
+        
         if [[ "$DRY_RUN" == "true" ]]; then
-            log_info "[DRY RUN] Would remove directory: $dest"
+            log_info "[DRY RUN] Would create backup and remove directory: $dest"
         else
-            log_warning "Removing directory to create symlink: $dest"
+            log_warning "Creating backup and removing directory: $dest"
+            
+            # Create backup
+            local backup_path
+            backup_path=$(create_backup "$dest" "$backup_name")
+            
+            if [[ $? -eq 0 ]] && [[ -n "$backup_path" ]]; then
+                log_info "Backup created at: $backup_path"
+            fi
+            
+            # Remove directory
             rm -rf "$dest"
         fi
     fi
