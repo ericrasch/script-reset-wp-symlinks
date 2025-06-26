@@ -35,12 +35,19 @@ cd script-reset-wp-symlinks
 ./setup-workspace.sh ~/Documents/wp-tools
 ```
 
-### **3️⃣ Configure Your Sites**
+### **3️⃣ Configure Your Sites (Auto-Generated!)**
 ```bash
 # Navigate to your workspace
 cd ~/Sites/scripts/wp-symlinks
 
-# Edit configuration for your actual sites (optional - auto-detection works without this)
+# Your configuration was auto-generated during setup!
+# Review what was detected:
+cat symlink-config.json
+
+# Re-generate if you add new sites:
+./generate-config.sh
+
+# Manual editing (optional - auto-detection works great):
 nano symlink-config.json
 ```
 
@@ -65,7 +72,8 @@ Your workspace will contain:
 ~/Sites/scripts/wp-symlinks/
 ├── enhanced-reset_wp_symlinks.sh    # Main auto-detection script
 ├── restore-from-backup.sh           # Backup restoration utility
-├── symlink-config.json              # Your site configuration
+├── generate-config.sh               # Auto-generate configuration
+├── symlink-config.json              # Your personalized configuration (auto-generated!)
 ├── backups/                         # Automatic backups directory
 ├── WORKSPACE-README.md              # Quick reference guide
 ├── setup-aliases.sh                 # Optional shell aliases
@@ -76,12 +84,12 @@ Your workspace will contain:
 
 | Feature | Manual Setup | This Tool |
 |---------|--------------|-----------|
-| **Setup** | Edit script arrays for each site | Zero configuration needed |
-| **New Sites** | Manual array updates | Automatic discovery |
-| **Plugin Support** | Manual path addition | Auto-detects custom plugins |
-| **Safety** | No backup system | Automatic timestamped backups |
-| **Testing** | No preview option | Dry-run mode available |
-| **Maintenance** | High - update paths manually | Zero - auto-discovers changes |
+| **Setup** | Edit script arrays for each site | **Auto-generated configuration** |
+| **New Sites** | Manual array updates | **Automatic discovery & config generation** |
+| **Plugin Support** | Manual path addition | **Auto-detects custom plugins** |
+| **Safety** | No backup system | **Automatic timestamped backups** |
+| **Testing** | No preview option | **Dry-run mode available** |
+| **Maintenance** | High - update paths manually | **Zero - just re-run generator** |
 
 ---
 
@@ -91,9 +99,10 @@ Your workspace will contain:
 1. **Reads LocalWP configuration** from `~/Library/Application Support/Local/sites.json`
 2. **Scans GitHub repositories** in `~/Sites/github/wp-*` directories
 3. **Smart matching** between LocalWP sites and GitHub repos
-4. **Discovers themes, plugins, and custom directories** automatically
-5. **Creates backups** before replacing any directories
-6. **Validates and creates symlinks** with comprehensive error checking
+4. **Generates personalized configuration** automatically during setup
+5. **Discovers themes, plugins, and custom directories** automatically
+6. **Creates backups** before replacing any directories
+7. **Validates and creates symlinks** with comprehensive error checking
 
 ### **What Gets Symlinked**
 - ✅ **Custom themes** (auto-detected in `wp-content/themes/`)
@@ -105,8 +114,8 @@ Your workspace will contain:
 
 ## **💡 Advanced Usage**
 
-### **Configuration File (Optional)**
-For special cases, customize `symlink-config.json`:
+### **Auto-Generated Configuration**
+The setup automatically generates a personalized `symlink-config.json` based on your actual LocalWP sites and GitHub repositories. For special cases, you can customize it:
 ```json
 {
   "overrides": {
@@ -137,6 +146,15 @@ For special cases, customize `symlink-config.json`:
 
 # Enable verbose output
 ./enhanced-reset_wp_symlinks.sh --verbose
+```
+
+### **Configuration Management**
+```bash
+# Re-generate configuration (when you add new sites)
+./generate-config.sh
+
+# View current configuration
+cat symlink-config.json
 ```
 
 ### **Backup Management**

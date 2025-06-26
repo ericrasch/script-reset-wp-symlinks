@@ -96,6 +96,7 @@ main() {
     local files_to_copy=(
         "enhanced-reset_wp_symlinks.sh"
         "restore-from-backup.sh"
+        "generate-config.sh"
     )
     
     for file in "${files_to_copy[@]}"; do
@@ -108,10 +109,24 @@ main() {
         fi
     done
     
-    # Copy and rename config template
-    if [[ -f "$SCRIPT_DIR/symlink-config.json.example" ]]; then
-        cp "$SCRIPT_DIR/symlink-config.json.example" "symlink-config.json"
-        log_success "Created: symlink-config.json (from example)"
+    # Generate personalized configuration
+    log_info "Generating personalized configuration..."
+    if [[ -f "./generate-config.sh" ]]; then
+        if ./generate-config.sh "symlink-config.json" 2>/dev/null; then
+            log_success "Generated personalized symlink-config.json"
+        else
+            log_warning "Auto-generation failed, using example template"
+            if [[ -f "$SCRIPT_DIR/symlink-config.json.example" ]]; then
+                cp "$SCRIPT_DIR/symlink-config.json.example" "symlink-config.json"
+                log_success "Created: symlink-config.json (from example)"
+            fi
+        fi
+    else
+        # Fallback to example
+        if [[ -f "$SCRIPT_DIR/symlink-config.json.example" ]]; then
+            cp "$SCRIPT_DIR/symlink-config.json.example" "symlink-config.json"
+            log_success "Created: symlink-config.json (from example)"
+        fi
     fi
     
     # Copy documentation
@@ -147,7 +162,8 @@ This directory contains your active WordPress symlink management tools.
 
 - `enhanced-reset_wp_symlinks.sh` - Main symlink management script
 - `restore-from-backup.sh` - Backup restoration utility
-- `symlink-config.json` - Your site configuration (customize this!)
+- `generate-config.sh` - Auto-generate personalized configuration
+- `symlink-config.json` - Your site configuration (auto-generated!)
 - `backups/` - Automatic backups (created when script runs)
 
 ## Common Commands
@@ -164,6 +180,9 @@ This directory contains your active WordPress symlink management tools.
 
 # Use custom config
 ./enhanced-reset_wp_symlinks.sh --config symlink-config.json
+
+# Re-generate configuration
+./generate-config.sh
 
 # Restore from backup
 ./restore-from-backup.sh
