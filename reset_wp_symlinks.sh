@@ -39,12 +39,20 @@
 ################################################################################
 
 # Define theme paths (GitHub Source and Local Destination) using arrays
+# IMPORTANT: Replace these example paths with your actual site paths
+# Copy the example lines below and modify them for each of your sites
 GITHUB_THEMES=(
-    "$HOME/path/to/github-repo/wp-content/themes/YOUR-THEME"
+    "$HOME/Sites/github/wp-example-com/wp-content/themes/example-theme"
+    "$HOME/Sites/github/wp-mysite-com/wp-content/themes/custom-theme"
+    "$HOME/Sites/github/wp-mysite-com/wp-content/plugins/custom-plugin"
+    # Add more paths as needed - one line per theme/plugin/directory
 )
 
 LOCAL_THEMES=(
-    "$HOME/path/to/local-wp-site/app/public/wp-content/themes/YOUR-THEME"
+    "$HOME/Local Sites/examplecom/app/public/wp-content/themes/example-theme"
+    "$HOME/Local Sites/mysitecom/app/public/wp-content/themes/custom-theme"
+    "$HOME/Local Sites/mysitecom/app/public/wp-content/plugins/custom-plugin"
+    # Add corresponding LocalWP paths - must match GITHUB_THEMES array order
 )
 
 # Ensure the arrays have matching lengths

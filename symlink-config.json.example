@@ -1,0 +1,73 @@
+{
+  "_description": "Configuration file for enhanced WordPress symlink management",
+  "_usage": "Copy this file to 'symlink-config.json' and customize for your setup",
+  
+  "settings": {
+    "github_base": "$HOME/Sites/github",
+    "localwp_base": "$HOME/Local Sites",
+    "auto_detect": true,
+    "interactive_fallback": true,
+    "exclude_plugins": [
+      "akismet",
+      "hello-dolly",
+      "wordpress-importer"
+    ]
+  },
+  
+  "mappings": [
+    {
+      "_comment": "Example: Custom mapping for specific site-to-repo relationship",
+      "localwp_site": "examplecom",
+      "github_repo": "wp-example-com",
+      "paths": [
+        "wp-content/themes/example-theme"
+      ]
+    },
+    {
+      "_comment": "Example: Site with both theme and plugin symlinks",
+      "localwp_site": "mywebsitecom",
+      "github_repo": "wp-mywebsite-com",
+      "paths": [
+        "wp-content/themes/custom-theme",
+        "wp-content/plugins/custom-plugin"
+      ]
+    },
+    {
+      "_comment": "Example: Site with custom directory structures",
+      "localwp_site": "clientsitecom",
+      "github_repo": "wp-clientsite-com",
+      "paths": [
+        "wp-content/themes/main-theme",
+        "app_resources",
+        "lib"
+      ]
+    }
+  ],
+  
+  "overrides": {
+    "_comment": "Site-specific overrides for auto-detection",
+    "specialsitecom": {
+      "github_repo": "wp-specialsite-com",
+      "include_only": [
+        "wp-content/themes/parent-theme",
+        "wp-content/themes/child-theme"
+      ]
+    }
+  },
+  
+  "global_excludes": {
+    "_comment": "Globally exclude these paths from auto-detection",
+    "themes": [
+      "twentytwentyone",
+      "twentytwentytwo",
+      "twentytwentythree",
+      "twentytwentyfour"
+    ],
+    "plugins": [
+      "akismet",
+      "hello-dolly",
+      "wordpress-importer",
+      "woocommerce"
+    ]
+  }
+}
