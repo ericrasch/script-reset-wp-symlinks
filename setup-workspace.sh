@@ -18,7 +18,7 @@
 set -euo pipefail
 
 # Default workspace location
-DEFAULT_WORKSPACE="$HOME/scripts/wp-symlinks"
+DEFAULT_WORKSPACE="$HOME/Sites/scripts/wp-symlinks"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Colors for output
@@ -52,7 +52,7 @@ DESCRIPTION:
     the repository. Copies scripts and sets up configuration files.
 
 OPTIONS:
-    workspace_path  Custom workspace location (default: ~/scripts/wp-symlinks)
+    workspace_path  Custom workspace location (default: ~/Sites/scripts/wp-symlinks)
     --help, -h      Show this help message
 
 EXAMPLES:

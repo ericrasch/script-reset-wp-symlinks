@@ -38,7 +38,7 @@ cd script-reset-wp-symlinks
 ### **3️⃣ Configure Your Sites**
 ```bash
 # Navigate to your workspace
-cd ~/scripts/wp-symlinks
+cd ~/Sites/scripts/wp-symlinks
 
 # Edit configuration for your actual sites (optional - auto-detection works without this)
 nano symlink-config.json
@@ -62,7 +62,7 @@ nano symlink-config.json
 
 Your workspace will contain:
 ```
-~/scripts/wp-symlinks/
+~/Sites/scripts/wp-symlinks/
 ├── enhanced-reset_wp_symlinks.sh    # Main auto-detection script
 ├── restore-from-backup.sh           # Backup restoration utility
 ├── symlink-config.json              # Your site configuration
