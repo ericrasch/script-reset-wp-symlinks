@@ -272,7 +272,8 @@ list_backups() {
         return 1
     fi
     
-    local backups=($(find "$backup_dir" -maxdepth 1 -type d -name "*_[0-9]*_[0-9]*" | sort -r))
+    local backups
+    backups=($(find "$backup_dir" -maxdepth 1 -type d -name "*_[0-9]*_[0-9]*" | sort -r))
     
     if [[ ${#backups[@]} -eq 0 ]]; then
         log_warning "No backups found"
@@ -281,10 +282,14 @@ list_backups() {
     
     log_info "Available backups:"
     for backup in "${backups[@]}"; do
-        local backup_name=$(basename "$backup")
-        local backup_date=$(echo "$backup_name" | grep -o '[0-9]\{8\}_[0-9]\{6\}')
-        local formatted_date=$(echo "$backup_date" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)_\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/')
-        local size=$(du -sh "$backup" | cut -f1)
+        local backup_name
+        backup_name=$(basename "$backup")
+        local backup_date
+        backup_date=$(echo "$backup_name" | grep -o '[0-9]\{8\}_[0-9]\{6\}')
+        local formatted_date
+        formatted_date=$(echo "$backup_date" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)_\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/')
+        local size
+        size=$(du -sh "$backup" | cut -f1)
         
         echo "  - $backup_name"
         echo "    Date: $formatted_date, Size: $size"

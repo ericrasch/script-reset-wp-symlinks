@@ -218,11 +218,13 @@ match_sites_to_repos() {
         local matched_repo=""
         
         # Strategy 1: Direct name matching (wp-example-com -> examplecom)
-        local normalized_site=$(echo "$site_name" | sed 's/[.-]//g' | tr '[:upper:]' '[:lower:]')
+        local normalized_site
+        normalized_site=$(echo "$site_name" | sed 's/[.-]//g' | tr '[:upper:]' '[:lower:]')
         
         for github_entry in "${github_repos[@]}"; do
             IFS='|' read -r repo_name repo_path <<< "$github_entry"
-            local normalized_repo=$(echo "$repo_name" | sed 's/wp-//; s/[.-]//g' | tr '[:upper:]' '[:lower:]')
+            local normalized_repo
+            normalized_repo=$(echo "$repo_name" | sed 's/wp-//; s/[.-]//g' | tr '[:upper:]' '[:lower:]')
             
             if [[ "$normalized_site" == "$normalized_repo" ]]; then
                 matched_repo="$repo_name|$repo_path"
@@ -262,7 +264,8 @@ discover_symlink_targets() {
     # Find themes
     if [[ -d "$repo_path/wp-content/themes" ]]; then
         find "$repo_path/wp-content/themes" -mindepth 1 -maxdepth 1 -type d | while read -r theme_dir; do
-            local theme_name=$(basename "$theme_dir")
+            local theme_name
+            theme_name=$(basename "$theme_dir")
             echo "theme|wp-content/themes/$theme_name"
         done
     fi
@@ -270,7 +273,8 @@ discover_symlink_targets() {
     # Find plugins
     if [[ -d "$repo_path/wp-content/plugins" ]]; then
         find "$repo_path/wp-content/plugins" -mindepth 1 -maxdepth 1 -type d | while read -r plugin_dir; do
-            local plugin_name=$(basename "$plugin_dir")
+            local plugin_name
+            plugin_name=$(basename "$plugin_dir")
             # Only include custom plugins (skip common WordPress plugins)
             if [[ ! "$plugin_name" =~ ^(akismet|hello-dolly|wordpress-importer)$ ]]; then
                 echo "plugin|wp-content/plugins/$plugin_name"
@@ -317,7 +321,8 @@ create_backup() {
     fi
     
     # Generate timestamp for backup
-    local timestamp=$(date +"%Y%m%d_%H%M%S")
+    local timestamp
+    timestamp=$(date +"%Y%m%d_%H%M%S")
     local backup_path="$BACKUP_DIR/${backup_name}_${timestamp}"
     
     if [[ "$DRY_RUN" == "true" ]]; then
@@ -420,8 +425,10 @@ create_symlink() {
         fi
     elif [[ -d "$dest" ]]; then
         # Create backup before removing directory
-        local backup_name=$(basename "$dest")
-        local site_name=$(echo "$dest" | grep -o '[^/]*\.com\|[^/]*\.org' | head -1 | sed 's/\./_/g')
+        local backup_name
+        backup_name=$(basename "$dest")
+        local site_name
+        site_name=$(echo "$dest" | grep -o '[^/]*\.com\|[^/]*\.org' | head -1 | sed 's/\./_/g')
         if [[ -n "$site_name" ]]; then
             backup_name="${site_name}_${backup_name}"
         fi

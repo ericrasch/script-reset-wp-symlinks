@@ -131,11 +131,13 @@ match_sites_to_repos() {
         local matched=false
         
         # Normalize site name for matching
-        local normalized_site=$(echo "$site_name" | sed 's/[.-]//g' | tr '[:upper:]' '[:lower:]')
+        local normalized_site
+        normalized_site=$(echo "$site_name" | sed 's/[.-]//g' | tr '[:upper:]' '[:lower:]')
         
         for github_entry in "${github_repos[@]}"; do
             IFS='|' read -r repo_name repo_path <<< "$github_entry"
-            local normalized_repo=$(echo "$repo_name" | sed 's/wp-//; s/[.-]//g' | tr '[:upper:]' '[:lower:]')
+            local normalized_repo
+            normalized_repo=$(echo "$repo_name" | sed 's/wp-//; s/[.-]//g' | tr '[:upper:]' '[:lower:]')
             
             if [[ "$normalized_site" == "$normalized_repo" ]]; then
                 echo "$site_name|$repo_name|$repo_path|$site_path"
@@ -163,7 +165,8 @@ discover_repo_paths() {
     # Find themes
     if [[ -d "$repo_path/wp-content/themes" ]]; then
         while IFS= read -r -d '' theme_dir; do
-            local theme_name=$(basename "$theme_dir")
+            local theme_name
+            theme_name=$(basename "$theme_dir")
             # Skip default WordPress themes
             if [[ ! "$theme_name" =~ ^twenty(twenty)?(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|twentyone|twentytwo|twentythree|twentyfour)$ ]]; then
                 paths+=("wp-content/themes/$theme_name")
@@ -174,7 +177,8 @@ discover_repo_paths() {
     # Find custom plugins
     if [[ -d "$repo_path/wp-content/plugins" ]]; then
         while IFS= read -r -d '' plugin_dir; do
-            local plugin_name=$(basename "$plugin_dir")
+            local plugin_name
+            plugin_name=$(basename "$plugin_dir")
             local include_this_plugin=false
             
             # Check if plugin is in include list
@@ -226,7 +230,8 @@ discover_repo_paths() {
 # Generate configuration file
 generate_config() {
     local output_file="$1"
-    local temp_file=$(mktemp)
+    local temp_file
+    temp_file=$(mktemp)
     
     log_info "Generating configuration..."
     
@@ -272,7 +277,8 @@ generate_config() {
 EOF
     
     # Add generation timestamp
-    local timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+    local timestamp
+    timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
     jq --arg timestamp "$timestamp" '._generated = $timestamp' "$temp_file" > "${temp_file}.tmp" && mv "${temp_file}.tmp" "$temp_file"
     
     # Generate mappings from detected matches
