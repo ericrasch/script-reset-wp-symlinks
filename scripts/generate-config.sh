@@ -123,7 +123,7 @@ match_sites_to_repos() {
         [[ -n "$repo_name" ]] && github_repos+=("$repo_name|$repo_path")
     done < <(find_github_repos)
     
-    log_info "Found ${#localwp_sites[@]} LocalWP sites and ${#github_repos[@]} GitHub repositories"
+    log_info "Found ${#localwp_sites[@]} LocalWP sites and ${#github_repos[@]} GitHub repositories" >&2
     
     # Direct matching approach
     for localwp_entry in "${localwp_sites[@]}"; do
@@ -140,13 +140,13 @@ match_sites_to_repos() {
             if [[ "$normalized_site" == "$normalized_repo" ]]; then
                 echo "$site_name|$repo_name|$repo_path|$site_path"
                 matched=true
-                log_success "Matched: $site_name ↔ $repo_name"
+                log_success "Matched: $site_name ↔ $repo_name" >&2
                 break
             fi
         done
         
         if [[ "$matched" == "false" ]]; then
-            log_warning "No match found for LocalWP site: $site_name"
+            log_warning "No match found for LocalWP site: $site_name" >&2
         fi
     done
 }
@@ -246,7 +246,7 @@ EOF
     local mappings='[]'
     
     while IFS='|' read -r site_name repo_name repo_path site_path; do
-        log_info "Processing: $site_name → $repo_name"
+        log_info "Processing: $site_name → $repo_name" >&2
         
         # Discover paths in repository
         local paths
