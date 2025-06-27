@@ -206,7 +206,11 @@ run_sync() {
     fi
     
     echo
-    ./generate-wp-symlinks.sh "${args[@]}"
+    if [[ ${#args[@]} -gt 0 ]]; then
+        ./generate-wp-symlinks.sh "${args[@]}"
+    else
+        ./generate-wp-symlinks.sh
+    fi
 }
 
 run_interactive() {
