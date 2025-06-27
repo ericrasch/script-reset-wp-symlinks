@@ -40,8 +40,8 @@ jobs:
         run: |
           echo "Checking for outdated script references..."
           
-          # Check if any docs still reference the old script name
-          if grep -r "enhanced-reset_wp_symlinks.sh" *.md scripts/ 2>/dev/null; then
+          # Check if any docs still reference the old script name (excluding changelog entries)
+          if grep -r "enhanced-reset_wp_symlinks.sh" *.md scripts/ --exclude-dir=.history --exclude-dir=.claude 2>/dev/null | grep -v "Renamed.*enhanced-reset_wp_symlinks.sh.*generate-wp-symlinks.sh"; then
             echo "❌ Found outdated script references"
             exit 1
           fi

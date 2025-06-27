@@ -118,7 +118,7 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 ```
 ~/Sites/scripts/wp-symlinks/
 ├── wp-symlinks                      # Main menu (copied from repo)
-├── enhanced-reset_wp_symlinks.sh    # Core engine
+├── generate-wp-symlinks.sh          # Core symlink generation engine
 ├── generate-config.sh               # Config generator  
 ├── restore-from-backup.sh           # Backup utility
 ├── symlink-config.json              # Auto-generated config

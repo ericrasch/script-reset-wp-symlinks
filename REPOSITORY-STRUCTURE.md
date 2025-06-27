@@ -48,7 +48,7 @@ script-reset-wp-symlinks/
 
 ### Advanced Path
 ```bash
-./scripts/enhanced-reset_wp_symlinks.sh --dry-run
+./scripts/generate-wp-symlinks.sh --dry-run
 ./scripts/generate-config.sh
 ./scripts/restore-from-backup.sh
 ```
@@ -57,7 +57,7 @@ script-reset-wp-symlinks/
 ```
 ~/Sites/scripts/wp-symlinks/
 ├── wp-symlinks              # Copied main menu
-├── enhanced-reset_wp_symlinks.sh
+├── generate-wp-symlinks.sh  # Main symlink generation script
 ├── generate-config.sh
 ├── restore-from-backup.sh
 ├── symlink-config.json      # Your personalized config
