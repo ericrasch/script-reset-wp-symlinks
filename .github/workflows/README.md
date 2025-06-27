@@ -60,12 +60,15 @@ When adding new workflows:
 
 ## Workflow Status
 
-All workflows should pass before merging to main. Check status badges:
+All workflows should pass before merging to main. Status badges will be available after first commit:
 
+<!-- 
+Status badges (uncomment after workflows are committed and run):
 - [![ShellCheck](../../actions/workflows/shellcheck.yml/badge.svg)](../../actions/workflows/shellcheck.yml)
 - [![Test Scripts](../../actions/workflows/test-scripts.yml/badge.svg)](../../actions/workflows/test-scripts.yml)
 - [![Documentation Check](../../actions/workflows/docs-check.yml/badge.svg)](../../actions/workflows/docs-check.yml)
 - [![Security Scan](../../actions/workflows/security.yml/badge.svg)](../../actions/workflows/security.yml)
+-->
 
 ## Local Testing
 
