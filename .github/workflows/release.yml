@@ -1,0 +1,69 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Extract version from tag
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+          # Extract changelog for this version
+          if [[ -f CHANGELOG.md ]]; then
+            # Get changelog section for this version
+            CHANGELOG=$(awk '/^## \['"$VERSION"'\]/{flag=1; next} /^## \[/{flag=0} flag' CHANGELOG.md)
+            echo "changelog<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGELOG" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "changelog=Release $VERSION" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: WordPress Symlink Manager v${{ steps.changelog.outputs.version }}
+          body: |
+            ## Changes
+            
+            ${{ steps.changelog.outputs.changelog }}
+            
+            ## Installation
+            
+            ```bash
+            # Clone the repository
+            git clone https://github.com/${{ github.repository }}.git
+            cd $(basename ${{ github.repository }})
+            
+            # Install dependencies
+            brew install jq
+            
+            # Run the interactive menu
+            ./wp-symlinks
+            ```
+            
+            ## Verification
+            
+            You can verify the release integrity by checking the commit hash:
+            ```
+            git log --oneline | head -5
+            ```
+          draft: false
+          prerelease: false

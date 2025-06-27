@@ -1,5 +1,10 @@
 # **WordPress Symlink Manager for LocalWP**
 
+[![ShellCheck](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/shellcheck.yml)
+[![Test Scripts](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/test-scripts.yml/badge.svg)](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/test-scripts.yml)
+[![Documentation Check](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/docs-check.yml/badge.svg)](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/docs-check.yml)
+[![Security Scan](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/security.yml/badge.svg)](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/security.yml)
+
 ## **Overview**
 
 This project provides powerful tools for automating symbolic link management between WordPress themes/plugins in **LocalWP environments** and their corresponding **GitHub repositories**. When WP Engine syncs overwrite your symlinked directories, these scripts ensure your LocalWP sites always point to the correct development repositories.

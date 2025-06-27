@@ -1,0 +1,81 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+
+jobs:
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+          
+      - name: Check for sensitive patterns
+        run: |
+          echo "Scanning for sensitive patterns..."
+          
+          # Check for hardcoded paths that might be sensitive
+          if grep -r "/Users/[^/]*/.*" . --exclude-dir=.git --exclude="*.md" 2>/dev/null; then
+            echo "⚠️  Found potential hardcoded user paths (review for sensitivity)"
+          fi
+          
+          # Check for potential credentials or API keys
+          PATTERNS=(
+            "password.*="
+            "api.*key.*="
+            "secret.*="
+            "token.*="
+          )
+          
+          for pattern in "${PATTERNS[@]}"; do
+            if grep -ri "$pattern" . --exclude-dir=.git --exclude-dir=.github 2>/dev/null; then
+              echo "⚠️  Found potential credential pattern: $pattern"
+            fi
+          done
+          
+          echo "✅ Security scan completed"
+          
+  permissions-check:
+    name: Check File Permissions
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check executable permissions
+        run: |
+          echo "Checking file permissions..."
+          
+          # Scripts should be executable
+          for script in wp-symlinks wp-symlinks-nocolor scripts/*.sh; do
+            if [[ -f "$script" ]]; then
+              if [[ ! -x "$script" ]]; then
+                echo "❌ Script not executable: $script"
+                exit 1
+              else
+                echo "✅ $script is executable"
+              fi
+            fi
+          done
+          
+          # Config files should not be executable
+          for config in *.json *.md; do
+            if [[ -f "$config" && -x "$config" ]]; then
+              echo "⚠️  Config file is executable (should not be): $config"
+            fi
+          done

@@ -1,0 +1,58 @@
+name: Documentation Check
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '**.md'
+      - '**.sh'
+      - 'wp-symlinks'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - '**.md'
+      - '**.sh'
+      - 'wp-symlinks'
+
+jobs:
+  check-links:
+    name: Check Documentation Links
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check Markdown links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          config-file: '.github/workflows/markdown-link-check-config.json'
+          
+  check-consistency:
+    name: Check Documentation Consistency
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check script references in docs
+        run: |
+          echo "Checking for outdated script references..."
+          
+          # Check if any docs still reference the old script name
+          if grep -r "enhanced-reset_wp_symlinks.sh" *.md scripts/ 2>/dev/null; then
+            echo "❌ Found outdated script references"
+            exit 1
+          fi
+          
+          # Check if all scripts mentioned in README exist
+          scripts_in_readme=$(grep -o '\./[^[:space:]]*\.sh' README.md | sort | uniq)
+          for script in $scripts_in_readme; do
+            if [[ ! -f "$script" ]]; then
+              echo "❌ Script mentioned in README does not exist: $script"
+              exit 1
+            fi
+          done
+          
+          echo "✅ Documentation consistency check passed"

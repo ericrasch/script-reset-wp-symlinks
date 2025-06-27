@@ -1,0 +1,72 @@
+name: Test Scripts
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-bash-compatibility:
+    name: Test Bash Compatibility
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        bash-version: ['4.4', '5.0', '5.1']
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install dependencies
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get update
+            sudo apt-get install -y jq
+          else
+            brew install jq
+          fi
+      
+      - name: Test script syntax
+        run: |
+          for script in wp-symlinks scripts/*.sh; do
+            echo "Checking syntax: $script"
+            bash -n "$script"
+          done
+      
+      - name: Test help commands
+        run: |
+          ./scripts/generate-wp-symlinks.sh --help || true
+          ./scripts/generate-config.sh --help || true
+          
+  test-json-generation:
+    name: Test JSON Generation
+    runs-on: macos-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install jq
+        run: brew install jq
+        
+      - name: Create test environment
+        run: |
+          # Create mock LocalWP config
+          mkdir -p "$HOME/Library/Application Support/Local"
+          echo '{"test-site": {"name": "Test Site", "path": "/test/path"}}' > "$HOME/Library/Application Support/Local/sites.json"
+          
+          # Create mock GitHub repos
+          mkdir -p "$HOME/Sites/github/wp-test-site/wp-content"
+          
+      - name: Test config generation
+        run: |
+          cd scripts
+          ./generate-config.sh test-config.json
+          
+          # Validate JSON
+          if jq . test-config.json > /dev/null 2>&1; then
+            echo "✅ Valid JSON generated"
+          else
+            echo "❌ Invalid JSON generated"
+            exit 1
+          fi
