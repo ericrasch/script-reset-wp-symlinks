@@ -156,6 +156,10 @@ discover_repo_paths() {
     local repo_path="$1"
     local paths=()
     
+    # Define include and exclude lists
+    local -a include_plugins=("products")
+    local -a exclude_plugins=("akismet" "hello-dolly" "wordpress-importer" "woocommerce")
+    
     # Find themes
     if [[ -d "$repo_path/wp-content/themes" ]]; then
         while IFS= read -r -d '' theme_dir; do
@@ -171,8 +175,34 @@ discover_repo_paths() {
     if [[ -d "$repo_path/wp-content/plugins" ]]; then
         while IFS= read -r -d '' plugin_dir; do
             local plugin_name=$(basename "$plugin_dir")
-            # Skip common WordPress plugins
-            if [[ ! "$plugin_name" =~ ^(akismet|hello-dolly|wordpress-importer|woocommerce)$ ]]; then
+            local include_this_plugin=false
+            
+            # Check if plugin is in include list
+            for include_plugin in "${include_plugins[@]}"; do
+                if [[ "$plugin_name" == "$include_plugin" ]]; then
+                    include_this_plugin=true
+                    break
+                fi
+            done
+            
+            # If not explicitly included, check if it should be excluded
+            if [[ "$include_this_plugin" == "false" ]]; then
+                local exclude_this_plugin=false
+                for exclude_plugin in "${exclude_plugins[@]}"; do
+                    if [[ "$plugin_name" == "$exclude_plugin" ]]; then
+                        exclude_this_plugin=true
+                        break
+                    fi
+                done
+                
+                # Include if not excluded
+                if [[ "$exclude_this_plugin" == "false" ]]; then
+                    include_this_plugin=true
+                fi
+            fi
+            
+            # Add plugin if it should be included
+            if [[ "$include_this_plugin" == "true" ]]; then
                 paths+=("wp-content/plugins/$plugin_name")
             fi
         done < <(find "$repo_path/wp-content/plugins" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null)
@@ -217,6 +247,9 @@ generate_config() {
       "hello-dolly",
       "wordpress-importer",
       "woocommerce"
+    ],
+    "include_plugins": [
+      "products"
     ]
   },
   
