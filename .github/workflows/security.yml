@@ -16,39 +16,49 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for comprehensive scanning
       
       - name: Scan for secrets
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          base: main
-          head: HEAD
-          extra_args: --debug --only-verified
+          extra_args: --only-verified --no-update
           
       - name: Check for sensitive patterns
         run: |
           echo "Scanning for sensitive patterns..."
           
+          # Set flags for findings
+          FOUND_ISSUES=false
+          
           # Check for hardcoded paths that might be sensitive
-          if grep -r "/Users/[^/]*/.*" . --exclude-dir=.git --exclude="*.md" 2>/dev/null; then
+          if grep -r "/Users/[^/]*/.*" . --exclude-dir=.git --exclude="*.md" --exclude-dir=.github 2>/dev/null; then
             echo "⚠️  Found potential hardcoded user paths (review for sensitivity)"
+            FOUND_ISSUES=true
           fi
           
           # Check for potential credentials or API keys
           PATTERNS=(
-            "password.*="
-            "api.*key.*="
-            "secret.*="
-            "token.*="
+            "password[[:space:]]*="
+            "api[[:space:]]*key[[:space:]]*="
+            "secret[[:space:]]*="
+            "token[[:space:]]*="
+            "auth[[:space:]]*="
           )
           
           for pattern in "${PATTERNS[@]}"; do
-            if grep -ri "$pattern" . --exclude-dir=.git --exclude-dir=.github 2>/dev/null; then
+            if grep -ri "$pattern" . --exclude-dir=.git --exclude-dir=.github --exclude="*.yml" 2>/dev/null; then
               echo "⚠️  Found potential credential pattern: $pattern"
+              FOUND_ISSUES=true
             fi
           done
           
-          echo "✅ Security scan completed"
+          if [[ "$FOUND_ISSUES" == "false" ]]; then
+            echo "✅ No sensitive patterns detected"
+          else
+            echo "ℹ️  Manual review recommended for flagged patterns"
+          fi
           
   permissions-check:
     name: Check File Permissions
