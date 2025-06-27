@@ -5,18 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.1.0] - 2025-06-27
 
 ### Changed
+- **Renamed main script** - `generate-wp-symlinks.sh` → `generate-wp-symlinks.sh` for clarity
 - **Reorganized repository structure** - Moved core scripts to `/scripts` subdirectory
 - **Single entry point** - `wp-symlinks` is now the only executable in root directory
 - **Cleaner architecture** - Professional CLI tool organization pattern
 - **Fixed terminal compatibility** - Improved color code handling with `printf`
 
 ### Added
+- **Include/Exclude plugin control** - New `include_plugins` setting to force inclusion of specific plugins
 - **Interactive menu system** (`wp-symlinks`) - Guided workflows for all operations
 - **Repository structure documentation** (`REPOSITORY-STRUCTURE.md`)
 - **Terminal compatibility version** (`wp-symlinks-nocolor`) - For terminals without ANSI support
+
+### Fixed
+- **JSON generation** - Fixed ANSI color codes leaking into generated configuration files
+- **Plugin detection** - Improved handling of plugins that should always be included
 
 ### Removed
 - **Legacy script** (`reset_wp_symlinks.sh`) - Superseded by enhanced auto-detection
@@ -25,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.0.0] - 2025-06-26
 
 ### Added
-- **Enhanced auto-detection script** (`enhanced-reset_wp_symlinks.sh`) with smart LocalWP and GitHub repository discovery
+- **Enhanced auto-detection script** (`generate-wp-symlinks.sh`) with smart LocalWP and GitHub repository discovery
 - **Automatic backup functionality** - Creates timestamped backups before replacing directories
 - **Backup restoration tool** (`restore-from-backup.sh`) with interactive selection and preview
 - **Configuration file support** - Optional JSON configuration for custom mappings and overrides
@@ -99,7 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Upgrading to v2.0.0
 
-**For existing users:** The enhanced script (`enhanced-reset_wp_symlinks.sh`) provides full backward compatibility while adding powerful auto-detection features. Your existing manual configuration in `active-reset_wp_symlinks.sh` will continue to work, but we recommend trying the enhanced script for easier maintenance.
+**For existing users:** The enhanced script (`generate-wp-symlinks.sh`) provides full backward compatibility while adding powerful auto-detection features. Your existing manual configuration in `active-reset_wp_symlinks.sh` will continue to work, but we recommend trying the enhanced script for easier maintenance.
 
 **Key benefits of upgrading:**
 - Zero manual configuration required

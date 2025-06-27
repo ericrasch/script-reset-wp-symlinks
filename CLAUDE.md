@@ -6,14 +6,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a modern WordPress symlink management tool for LocalWP development environments. It provides intelligent auto-detection of LocalWP sites and GitHub repositories, with automatic configuration generation and comprehensive backup management.
 
-## Current Architecture (v2.0+)
+## Current Architecture (v2.1+)
 
 ### Main Entry Point
 - **`wp-symlinks`** - Interactive menu system that guides users through all operations
 - Single command interface for setup, configuration, execution, and management
 
 ### Core Scripts (in `/scripts` directory)
-- **`enhanced-reset_wp_symlinks.sh`** - Main symlink engine with auto-detection
+- **`generate-wp-symlinks.sh`** - Main symlink generation engine with auto-detection
 - **`generate-config.sh`** - Auto-configuration generator using LocalWP's sites.json
 - **`restore-from-backup.sh`** - Interactive backup restoration utility
 - **`setup-workspace.sh`** - Workspace creation and setup
@@ -23,6 +23,7 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 - **Smart matching** between LocalWP sites and GitHub repositories  
 - **Optional JSON config** (`symlink-config.json`) for custom overrides
 - **Backup management** with timestamped directory preservation
+- **Include/Exclude Plugins**: Fine-grained control with `include_plugins` and `exclude_plugins` settings
 
 ## Key Technical Components
 
@@ -58,13 +59,13 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 ### Direct Script Access
 ```bash
 # Auto-detection with dry-run
-./scripts/enhanced-reset_wp_symlinks.sh --dry-run
+./scripts/generate-wp-symlinks.sh --dry-run
 
 # Generate configuration
 ./scripts/generate-config.sh
 
 # Interactive matching
-./scripts/enhanced-reset_wp_symlinks.sh --interactive
+./scripts/generate-wp-symlinks.sh --interactive
 
 # Backup restoration
 ./scripts/restore-from-backup.sh
@@ -79,7 +80,7 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 ./scripts/generate-config.sh /tmp/test-config.json
 
 # Test with specific config
-./scripts/enhanced-reset_wp_symlinks.sh --config /path/to/config.json --dry-run
+./scripts/generate-wp-symlinks.sh --config /path/to/config.json --dry-run
 
 # Test backup functionality
 ./scripts/restore-from-backup.sh
@@ -149,7 +150,8 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 
 ## Version History
 
-- **v2.0+**: Current architecture with auto-detection and interactive menu
+- **v2.1**: Renamed main script to `generate-wp-symlinks.sh`, added `include_plugins` setting, fixed JSON generation
+- **v2.0**: Complete rewrite with auto-detection and interactive menu
 - **v1.x**: Deprecated manual array-based configuration (removed from repository)
 
 This architecture provides zero-configuration operation while maintaining full customization capabilities for advanced users.

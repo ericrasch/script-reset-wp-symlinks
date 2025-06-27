@@ -327,8 +327,8 @@ show_summary() {
     echo
     log_info "Next steps:"
     echo "  1. Review the generated configuration: nano $config_file"
-    echo "  2. Test with dry-run: ./enhanced-reset_wp_symlinks.sh --dry-run --config $config_file"
-    echo "  3. Execute: ./enhanced-reset_wp_symlinks.sh --config $config_file"
+    echo "  2. Test with dry-run: ./generate-wp-symlinks.sh --dry-run --config $config_file"
+    echo "  3. Execute: ./generate-wp-symlinks.sh --config $config_file"
 }
 
 # Interactive mode for unmatched sites

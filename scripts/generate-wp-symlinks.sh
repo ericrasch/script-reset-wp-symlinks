@@ -1,6 +1,6 @@
 #!/bin/bash
 ################################################################################
-# Script Name: enhanced-reset_wp_symlinks.sh
+# Script Name: generate-wp-symlinks.sh
 #
 # Description:
 #   Enhanced version with auto-detection of LocalWP sites and GitHub repos.
@@ -19,7 +19,7 @@
 #   - Selective plugin/theme symlink management
 #
 # Usage:
-#   ./enhanced-reset_wp_symlinks.sh [OPTIONS]
+#   ./generate-wp-symlinks.sh [OPTIONS]
 #
 # Options:
 #   --dry-run, -d     Preview changes without executing

@@ -105,7 +105,7 @@ main() {
     
     # Copy other scripts from scripts directory
     local files_to_copy=(
-        "enhanced-reset_wp_symlinks.sh"
+        "generate-wp-symlinks.sh"
         "restore-from-backup.sh"
         "generate-config.sh"
     )
@@ -166,13 +166,13 @@ This directory contains your active WordPress symlink management tools.
 ## Quick Start
 
 1. **Run the interactive menu**: `./wp-symlinks`
-2. **Or test directly**: `./enhanced-reset_wp_symlinks.sh --dry-run`
-3. **Execute**: `./enhanced-reset_wp_symlinks.sh`
+2. **Or test directly**: `./generate-wp-symlinks.sh --dry-run`
+3. **Execute**: `./generate-wp-symlinks.sh`
 
 ## Files in this workspace
 
 - `wp-symlinks` - 🎯 **MAIN ENTRY POINT** (interactive menu)
-- `enhanced-reset_wp_symlinks.sh` - Core symlink management script
+- `generate-wp-symlinks.sh` - Core symlink management script
 - `restore-from-backup.sh` - Backup restoration utility
 - `generate-config.sh` - Auto-generate personalized configuration
 - `symlink-config.json` - Your site configuration (auto-generated!)
@@ -186,16 +186,16 @@ This directory contains your active WordPress symlink management tools.
 
 # Direct commands:
 # Preview what would be done
-./enhanced-reset_wp_symlinks.sh --dry-run
+./generate-wp-symlinks.sh --dry-run
 
 # Run with auto-detection
-./enhanced-reset_wp_symlinks.sh
+./generate-wp-symlinks.sh
 
 # Interactive mode for ambiguous matches
-./enhanced-reset_wp_symlinks.sh --interactive
+./generate-wp-symlinks.sh --interactive
 
 # Use custom config
-./enhanced-reset_wp_symlinks.sh --config symlink-config.json
+./generate-wp-symlinks.sh --config symlink-config.json
 
 # Re-generate configuration
 ./generate-config.sh
@@ -223,8 +223,8 @@ EOF
 
 # WordPress Symlink Management Aliases
 alias wp-symlinks='cd "$workspace"'
-alias wp-sync='$workspace/enhanced-reset_wp_symlinks.sh'
-alias wp-sync-dry='$workspace/enhanced-reset_wp_symlinks.sh --dry-run'
+alias wp-sync='$workspace/generate-wp-symlinks.sh'
+alias wp-sync-dry='$workspace/generate-wp-symlinks.sh --dry-run'
 alias wp-restore='$workspace/restore-from-backup.sh'
 
 echo "WordPress symlink aliases added!"
@@ -241,8 +241,8 @@ EOF
     log_info "Next steps:"
     echo -e "  1. ${CYAN}cd $workspace${NC}"
     echo -e "  2. ${CYAN}nano symlink-config.json${NC} (customize for your sites)"
-    echo -e "  3. ${CYAN}./enhanced-reset_wp_symlinks.sh --dry-run${NC} (test first)"
-    echo -e "  4. ${CYAN}./enhanced-reset_wp_symlinks.sh${NC} (run for real)"
+    echo -e "  3. ${CYAN}./generate-wp-symlinks.sh --dry-run${NC} (test first)"
+    echo -e "  4. ${CYAN}./generate-wp-symlinks.sh${NC} (run for real)"
     echo
     log_info "Optional: Add convenient aliases:"
     echo -e "  ${CYAN}./setup-aliases.sh >> ~/.bashrc${NC}"

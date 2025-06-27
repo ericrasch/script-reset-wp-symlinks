@@ -42,8 +42,8 @@ brew install jq
 
 # Navigate to workspace and run directly
 cd ~/Sites/scripts/wp-symlinks
-./enhanced-reset_wp_symlinks.sh --dry-run
-./enhanced-reset_wp_symlinks.sh
+./generate-wp-symlinks.sh --dry-run
+./generate-wp-symlinks.sh
 ```
 
 ---
@@ -54,7 +54,7 @@ Your workspace will contain:
 ```
 ~/Sites/scripts/wp-symlinks/
 ├── wp-symlinks                      # 🎯 MAIN ENTRY POINT (interactive menu)
-├── enhanced-reset_wp_symlinks.sh    # Core auto-detection script
+├── generate-wp-symlinks.sh          # Core symlink generation script
 ├── restore-from-backup.sh           # Backup restoration utility
 ├── generate-config.sh               # Auto-generate configuration
 ├── symlink-config.json              # Your personalized configuration (auto-generated!)
@@ -117,19 +117,19 @@ The setup automatically generates a personalized `symlink-config.json` based on 
 ### **Command Line Options**
 ```bash
 # Preview all changes without executing
-./enhanced-reset_wp_symlinks.sh --dry-run
+./generate-wp-symlinks.sh --dry-run
 
 # Interactive mode for ambiguous site matches
-./enhanced-reset_wp_symlinks.sh --interactive
+./generate-wp-symlinks.sh --interactive
 
 # Use custom configuration file
-./enhanced-reset_wp_symlinks.sh --config my-config.json
+./generate-wp-symlinks.sh --config my-config.json
 
 # Skip automatic backups
-./enhanced-reset_wp_symlinks.sh --no-backup
+./generate-wp-symlinks.sh --no-backup
 
 # Enable verbose output
-./enhanced-reset_wp_symlinks.sh --verbose
+./generate-wp-symlinks.sh --verbose
 ```
 
 ### **Configuration Management**
@@ -179,6 +179,35 @@ wp-restore      # Restore backups
 - **[CHANGELOG.md](CHANGELOG.md)** - Version history and feature changes
 - **[MIGRATION.md](MIGRATION.md)** - Upgrade guide from manual arrays to auto-detection
 - **[CLAUDE.md](CLAUDE.md)** - Technical architecture for development
+
+---
+
+## **✨ Recent Enhancements (v2.1)**
+
+### **Include/Exclude Plugin Control**
+The configuration now supports fine-grained control over which plugins are symlinked:
+
+```json
+{
+  "settings": {
+    "exclude_plugins": ["akismet", "hello-dolly", "wordpress-importer", "woocommerce"],
+    "include_plugins": ["products"]  // Always include these plugins even if excluded
+  }
+}
+```
+
+- **`include_plugins`**: Force specific plugins to always be included
+- **`exclude_plugins`**: Skip these common WordPress plugins
+- Priority: Plugins in `include_plugins` override exclusion rules
+
+### **Improved Script Naming**
+- Renamed `enhanced-reset_wp_symlinks.sh` → `generate-wp-symlinks.sh` for clarity
+- Better reflects the script's purpose of generating and managing symlinks
+
+### **Better Error Handling**
+- Fixed JSON generation issues with proper stderr redirection
+- Cleaner configuration files without ANSI color codes
+- Improved validation and error messages
 
 ---
 

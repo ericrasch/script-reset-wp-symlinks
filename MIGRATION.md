@@ -12,16 +12,16 @@ brew install jq
 ### 2. Test Enhanced Script
 ```bash
 # Make executable
-chmod +x enhanced-reset_wp_symlinks.sh
+chmod +x generate-wp-symlinks.sh
 
 # Run in dry-run mode first
-./enhanced-reset_wp_symlinks.sh --dry-run
+./generate-wp-symlinks.sh --dry-run
 ```
 
 ### 3. Run Enhanced Script
 ```bash
 # Auto-detection mode (recommended)
-./enhanced-reset_wp_symlinks.sh
+./generate-wp-symlinks.sh
 ```
 
 ## Key Advantages of Enhanced Script
@@ -66,7 +66,7 @@ Run both scripts in comparison:
 ./active-reset_wp_symlinks.sh
 
 # Enhanced script dry-run
-./enhanced-reset_wp_symlinks.sh --dry-run
+./generate-wp-symlinks.sh --dry-run
 ```
 
 ### 2. Validate Detection
@@ -133,13 +133,13 @@ cp symlink-config.json.example symlink-config.json
 nano symlink-config.json
 
 # Use custom config
-./enhanced-reset_wp_symlinks.sh --config symlink-config.json
+./generate-wp-symlinks.sh --config symlink-config.json
 ```
 
 ### Interactive Mode for New Sites
 ```bash
 # Use interactive mode when adding new sites
-./enhanced-reset_wp_symlinks.sh --interactive
+./generate-wp-symlinks.sh --interactive
 ```
 
 ## Troubleshooting
@@ -173,7 +173,7 @@ brew install jq
 ## Support
 
 If you encounter issues during migration:
-1. Run `./enhanced-reset_wp_symlinks.sh --help`
+1. Run `./generate-wp-symlinks.sh --help`
 2. Test with `--dry-run` mode first
 3. Use `--interactive` for ambiguous cases
 4. Check LocalWP sites.json exists and is readable

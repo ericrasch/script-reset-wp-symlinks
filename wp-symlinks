@@ -65,7 +65,7 @@ detect_workspace() {
     )
     
     for workspace in "${possible_workspaces[@]}"; do
-        if [[ -d "$workspace" ]] && [[ -f "$workspace/enhanced-reset_wp_symlinks.sh" ]]; then
+        if [[ -d "$workspace" ]] && [[ -f "$workspace/generate-wp-symlinks.sh" ]]; then
             echo "$workspace"
             return 0
         fi
@@ -186,8 +186,8 @@ run_sync() {
     
     cd "$workspace"
     
-    if [[ ! -f "./enhanced-reset_wp_symlinks.sh" ]]; then
-        log_error "enhanced-reset_wp_symlinks.sh not found in workspace"
+    if [[ ! -f "./generate-wp-symlinks.sh" ]]; then
+        log_error "generate-wp-symlinks.sh not found in workspace"
         return 1
     fi
     
@@ -206,7 +206,7 @@ run_sync() {
     fi
     
     echo
-    ./enhanced-reset_wp_symlinks.sh "${args[@]}"
+    ./generate-wp-symlinks.sh "${args[@]}"
 }
 
 run_interactive() {
@@ -219,7 +219,7 @@ run_interactive() {
     cd "$workspace"
     log_info "Running in interactive mode..."
     echo
-    ./enhanced-reset_wp_symlinks.sh --interactive
+    ./generate-wp-symlinks.sh --interactive
 }
 
 view_config() {
@@ -319,7 +319,7 @@ $(echo -e "${YELLOW}Files and Locations:${NC}")
 
 $(echo -e "${YELLOW}Command Line Usage:${NC}")
 You can also run scripts directly from your workspace:
-  ./enhanced-reset_wp_symlinks.sh --dry-run
+  ./generate-wp-symlinks.sh --dry-run
   ./generate-config.sh
   ./restore-from-backup.sh
 

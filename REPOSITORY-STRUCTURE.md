@@ -6,7 +6,7 @@
 script-reset-wp-symlinks/
 ├── wp-symlinks              # 🎯 MAIN ENTRY POINT (interactive menu)
 ├── scripts/                 # Core functionality scripts
-│   ├── enhanced-reset_wp_symlinks.sh    # Main symlink engine
+│   ├── generate-wp-symlinks.sh          # Main symlink generation engine
 │   ├── generate-config.sh               # Auto-configuration generator
 │   ├── restore-from-backup.sh           # Backup restoration
 │   └── setup-workspace.sh               # Workspace installer
