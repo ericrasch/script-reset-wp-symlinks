@@ -18,7 +18,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   prepare-release:
@@ -74,9 +73,7 @@ jobs:
           
           echo "::notice::Please update CHANGELOG.md with the actual changes for version $VERSION"
       
-      - name: Create Pull Request
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create and Push Branch
         run: |
           BRANCH="release/v${{ inputs.version }}"
           git checkout -b "$BRANCH"
@@ -84,22 +81,28 @@ jobs:
           git commit -m "Prepare release v${{ inputs.version }}"
           git push origin "$BRANCH"
           
-          # Create PR body file
-          cat > pr-body.md << 'PR_EOF'
-          ## Release Checklist
-
-          - [ ] Update CHANGELOG.md with all changes
-          - [ ] Run all tests locally
-          - [ ] Verify all GitHub Actions pass
-          - [ ] Review documentation for accuracy
-
-          ## Version: v${{ inputs.version }}
-          Type: ${{ inputs.release_type }}
-
-          Once this PR is merged, the release will be created automatically via the tag push.
-          PR_EOF
+          # Create PR instructions
+          echo "## 🎉 Release branch created successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "1. **Create Pull Request**: [Click here to create PR](https://github.com/${{ github.repository }}/pull/new/release/v${{ inputs.version }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "2. **Update CHANGELOG.md** with the actual changes for v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "3. **PR Template** (copy this for your PR description):" >> $GITHUB_STEP_SUMMARY
+          echo '```markdown' >> $GITHUB_STEP_SUMMARY
+          echo "## Release Checklist" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Update CHANGELOG.md with all changes" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Run all tests locally" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Verify all GitHub Actions pass" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Review documentation for accuracy" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Version: v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "Type: ${{ inputs.release_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Once this PR is merged, the release will be created automatically via the tag push." >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
           
-          gh pr create \
-            --title "Release v${{ inputs.version }}" \
-            --body-file pr-body.md \
-            --base main
+          echo "::notice::✅ Branch created! Click 'Summary' above for PR creation link and instructions."

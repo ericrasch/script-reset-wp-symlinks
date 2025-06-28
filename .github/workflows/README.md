@@ -49,7 +49,8 @@ This directory contains automated workflows for the WordPress Symlink Manager re
 - **Features**:
   - Creates release branch
   - Updates CHANGELOG.md template
-  - Opens PR for review
+  - Provides PR creation link and template
+  - Shows instructions in workflow summary
 
 ## Configuration Files
 
@@ -105,9 +106,13 @@ act push
    - Select the release type (patch/minor/major)
    - Click "Run workflow"
 
-2. **Update the changelog**:
-   - A PR will be created automatically with a CHANGELOG.md template
-   - Edit the PR to fill in the actual changes under the appropriate sections:
+2. **Create the Pull Request**:
+   - The workflow will push a branch with the CHANGELOG template
+   - Click the link in the workflow summary to create the PR
+   - Copy the PR template from the summary
+   
+3. **Update the changelog**:
+   - Edit the CHANGELOG.md in the PR to fill in actual changes:
      - `### Added` - for new features
      - `### Changed` - for changes in existing functionality
      - `### Fixed` - for bug fixes
@@ -115,7 +120,7 @@ act push
    - Remove any empty sections
    - Review and merge the PR
 
-3. **Create and push the tag**:
+4. **Create and push the tag**:
    ```bash
    # After merging the PR, pull the latest changes
    git pull origin main
@@ -125,7 +130,7 @@ act push
    git push origin vX.Y.Z
    ```
 
-4. **Automatic release creation**:
+5. **Automatic release creation**:
    - The `release.yml` workflow will automatically:
      - Extract the changelog for this version
      - Create a GitHub release with the changelog
