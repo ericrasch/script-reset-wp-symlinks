@@ -18,7 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Include/Exclude plugin control** - New `include_plugins` setting to force inclusion of specific plugins
 - **Interactive menu system** (`wp-symlinks`) - Guided workflows for all operations
 - **Repository structure documentation** (`REPOSITORY-STRUCTURE.md`)
-- **Terminal compatibility version** (`wp-symlinks-nocolor`) - For terminals without ANSI support
 
 ### Fixed
 - **JSON generation** - Fixed ANSI color codes leaking into generated configuration files

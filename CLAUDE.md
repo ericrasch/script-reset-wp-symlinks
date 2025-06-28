@@ -51,9 +51,6 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 ```bash
 # Main interface
 ./wp-symlinks
-
-# No-color version for compatibility
-./wp-symlinks-nocolor
 ```
 
 ### Direct Script Access
@@ -143,7 +140,7 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 ## Development Notes
 
 - **No Legacy Support**: Version 2.0+ is a complete rewrite with no backward compatibility
-- **Terminal Compatibility**: Dual versions (color/no-color) for different terminal environments
+- **Terminal Compatibility**: Full color support with emoji indicators
 - **Workspace Isolation**: User data completely separated from repository
 - **Auto-Update Safe**: Repository updates don't affect user workspaces
 - **Public Repository Safe**: No sensitive information stored in repository files

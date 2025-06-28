@@ -23,7 +23,7 @@ jobs:
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
-          extra_args: --only-verified --no-update
+          extra_args: --only-verified
           
       - name: Check for sensitive patterns
         run: |
@@ -72,7 +72,7 @@ jobs:
           echo "Checking file permissions..."
           
           # Scripts should be executable
-          for script in wp-symlinks wp-symlinks-nocolor scripts/*.sh; do
+          for script in wp-symlinks scripts/*.sh; do
             if [[ -f "$script" ]]; then
               if [[ ! -x "$script" ]]; then
                 echo "❌ Script not executable: $script"
