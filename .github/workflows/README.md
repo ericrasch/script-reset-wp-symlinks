@@ -98,7 +98,7 @@ act push
 ### Creating a New Release
 
 1. **Start the release process**:
-   - Go to the [Actions tab](../../actions) on GitHub
+   - Go to the Actions tab on GitHub
    - Click on "Release Automation" in the left sidebar
    - Click "Run workflow"
    - Enter the new version number (e.g., `2.1.2`)
