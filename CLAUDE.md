@@ -9,16 +9,19 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 ## Current Architecture (v2.1+)
 
 ### Main Entry Point
+
 - **`wp-symlinks`** - Interactive menu system that guides users through all operations
 - Single command interface for setup, configuration, execution, and management
 
 ### Core Scripts (in `/scripts` directory)
+
 - **`generate-wp-symlinks.sh`** - Main symlink generation engine with auto-detection
 - **`generate-config.sh`** - Auto-configuration generator using LocalWP's sites.json
 - **`restore-from-backup.sh`** - Interactive backup restoration utility
 - **`setup-workspace.sh`** - Workspace creation and setup
 
 ### Configuration System
+
 - **Auto-generated config** via LocalWP sites.json parsing and GitHub repo scanning
 - **Smart matching** between LocalWP sites and GitHub repositories  
 - **Optional JSON config** (`symlink-config.json`) for custom overrides
@@ -28,18 +31,21 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 ## Key Technical Components
 
 ### Auto-Detection Engine
+
 - **LocalWP Integration**: Parses `~/Library/Application Support/Local/sites.json`
 - **GitHub Repository Scanning**: Finds WordPress projects in `~/Sites/github/wp-*`
 - **Smart Matching Algorithm**: Normalizes names to match sites with repositories
 - **Content Discovery**: Auto-detects themes, plugins, and custom directories
 
 ### Symlink Management
+
 - **Validation Layer**: Checks LocalWP site existence and source directory validity
 - **Backup Creation**: Automatic timestamped backups before replacing directories
 - **Path Handling**: Robust support for custom directories (`app_resources`, `lib`, etc.)
 - **Error Recovery**: Comprehensive error handling with rollback capabilities
 
 ### User Experience
+
 - **Interactive Menu**: Clear workflow guidance with colored output
 - **Dry-Run Mode**: Safe preview of all operations before execution
 - **Status Display**: Real-time feedback on operations and configurations
@@ -48,12 +54,14 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 ## Development Commands
 
 ### Interactive Usage (Recommended)
+
 ```bash
 # Main interface
 ./wp-symlinks
 ```
 
 ### Direct Script Access
+
 ```bash
 # Auto-detection with dry-run
 ./scripts/generate-wp-symlinks.sh --dry-run
@@ -72,6 +80,7 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 ```
 
 ### Testing Commands
+
 ```bash
 # Test configuration generation
 ./scripts/generate-config.sh /tmp/test-config.json
@@ -86,6 +95,7 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 ## Configuration Architecture
 
 ### Auto-Generated Configuration
+
 ```json
 {
   "settings": {
@@ -112,7 +122,8 @@ This is a modern WordPress symlink management tool for LocalWP development envir
 ```
 
 ### Workspace Structure
-```
+
+```text
 ~/Sites/scripts/wp-symlinks/
 ├── wp-symlinks                      # Main menu (copied from repo)
 ├── generate-wp-symlinks.sh          # Core symlink generation engine

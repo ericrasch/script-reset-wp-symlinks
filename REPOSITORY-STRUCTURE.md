@@ -2,7 +2,7 @@
 
 ## Clean Architecture
 
-```
+```text
 script-reset-wp-symlinks/
 ├── wp-symlinks              # 🎯 MAIN ENTRY POINT (interactive menu)
 ├── scripts/                 # Core functionality scripts
@@ -41,11 +41,13 @@ script-reset-wp-symlinks/
 ## Usage Paths
 
 ### Beginner Path
+
 ```bash
 ./wp-symlinks  # Interactive menu handles everything
 ```
 
 ### Advanced Path
+
 ```bash
 ./scripts/generate-wp-symlinks.sh --dry-run
 ./scripts/generate-config.sh
@@ -53,7 +55,8 @@ script-reset-wp-symlinks/
 ```
 
 ### Workspace Structure (After Setup)
-```
+
+```text
 ~/Sites/scripts/wp-symlinks/
 ├── wp-symlinks              # Copied main menu
 ├── generate-wp-symlinks.sh  # Main symlink generation script

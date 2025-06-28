@@ -143,7 +143,7 @@ The setup automatically generates a personalized `symlink-config.json` based on 
 ### **Configuration Management**
 ```bash
 # Re-generate configuration (when you add new sites)
-./generate-config.sh
+./scripts/generate-config.sh
 
 # View current configuration
 cat symlink-config.json
