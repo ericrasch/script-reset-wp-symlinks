@@ -26,7 +26,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
-PURPLE='\033[0;35m'
+# PURPLE='\033[0;35m' # Reserved for future use
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
@@ -78,7 +78,8 @@ list_backups() {
         return 1
     fi
     
-    local backups=($(find "$BACKUP_DIR" -maxdepth 1 -type d -name "*_[0-9]*_[0-9]*" | sort -r))
+    local backups
+    mapfile -t backups < <(find "$BACKUP_DIR" -maxdepth 1 -type d -name "*_[0-9]*_[0-9]*" | sort -r)
     
     if [[ ${#backups[@]} -eq 0 ]]; then
         log_warning "No backups found in: $BACKUP_DIR"
@@ -88,10 +89,14 @@ list_backups() {
     log_info "Available backups:"
     for i in "${!backups[@]}"; do
         local backup_path="${backups[$i]}"
-        local backup_name=$(basename "$backup_path")
-        local backup_date=$(echo "$backup_name" | grep -o '[0-9]\{8\}_[0-9]\{6\}')
-        local formatted_date=$(echo "$backup_date" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)_\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/')
-        local size=$(du -sh "$backup_path" | cut -f1)
+        local backup_name
+        backup_name=$(basename "$backup_path")
+        local backup_date
+        backup_date=$(echo "$backup_name" | grep -o '[0-9]\{8\}_[0-9]\{6\}')
+        local formatted_date
+        formatted_date=$(echo "$backup_date" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)_\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/')
+        local size
+        size=$(du -sh "$backup_path" | cut -f1)
         
         echo -e "  $((i+1)). ${CYAN}$backup_name${NC}"
         echo -e "     Date: $formatted_date"
@@ -109,7 +114,8 @@ select_backup() {
         return 1
     fi
     
-    local backups=($(find "$BACKUP_DIR" -maxdepth 1 -type d -name "*_[0-9]*_[0-9]*" | sort -r))
+    local backups
+    mapfile -t backups < <(find "$BACKUP_DIR" -maxdepth 1 -type d -name "*_[0-9]*_[0-9]*" | sort -r)
     
     echo -n "Select backup number (1-${#backups[@]}) or 0 to cancel: "
     read -r choice
@@ -142,7 +148,9 @@ restore_backup() {
     log_info "Backup found: $backup_path"
     
     # Try to determine original location from backup name
-    local original_name=$(echo "$backup_name" | sed 's/_[0-9]\{8\}_[0-9]\{6\}$//')
+    # Determine original location from backup name (currently unused)
+    # local original_name
+    # original_name=$(echo "$backup_name" | sed 's/_[0-9]\{8\}_[0-9]\{6\}$//')
     
     log_warning "IMPORTANT: You need to specify the destination path manually."
     log_info "Backup contents preview:"
@@ -178,7 +186,8 @@ restore_backup() {
     log_info "Restoring backup..."
     
     # Create parent directory if needed
-    local parent_dir=$(dirname "$destination")
+    local parent_dir
+    parent_dir=$(dirname "$destination")
     if [[ ! -d "$parent_dir" ]]; then
         log_info "Creating parent directory: $parent_dir"
         mkdir -p "$parent_dir"

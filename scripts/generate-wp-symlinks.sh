@@ -37,14 +37,14 @@ CONFIG_DIR="$SCRIPT_DIR"
 DEFAULT_CONFIG="$CONFIG_DIR/symlink-config.json"
 LOCALWP_CONFIG="$HOME/Library/Application Support/Local/sites.json"
 GITHUB_BASE="$HOME/Sites/github"
-LOCALWP_BASE="$HOME/Local Sites"
+# LOCALWP_BASE is now dynamically determined from LocalWP's sites.json
 BACKUP_DIR="$SCRIPT_DIR/backups"
 
 # Script options
 DRY_RUN=false
 INTERACTIVE=false
 CONFIG_FILE=""
-VERBOSE=false
+# VERBOSE=false # Reserved for future verbose output implementation
 CREATE_BACKUPS=true
 
 # Colors for output
@@ -129,7 +129,8 @@ parse_args() {
                 shift 2
                 ;;
             --verbose|-v)
-                VERBOSE=true
+                # VERBOSE=true # Reserved for future verbose output implementation
+                log_warning "Verbose mode not yet implemented"
                 shift
                 ;;
             --no-backup)
@@ -259,7 +260,7 @@ match_sites_to_repos() {
 # Discover symlink targets in a repository
 discover_symlink_targets() {
     local repo_path="$1"
-    local targets=()
+    # Function outputs discovered paths directly via echo
     
     # Find themes
     if [[ -d "$repo_path/wp-content/themes" ]]; then

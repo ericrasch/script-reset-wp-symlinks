@@ -273,7 +273,7 @@ list_backups() {
     fi
     
     local backups
-    backups=($(find "$backup_dir" -maxdepth 1 -type d -name "*_[0-9]*_[0-9]*" | sort -r))
+    mapfile -t backups < <(find "$backup_dir" -maxdepth 1 -type d -name "*_[0-9]*_[0-9]*" | sort -r)
     
     if [[ ${#backups[@]} -eq 0 ]]; then
         log_warning "No backups found"
