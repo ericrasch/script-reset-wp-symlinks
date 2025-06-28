@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+
 jobs:
   create-release:
     name: Create Release
@@ -34,36 +37,36 @@ jobs:
           fi
       
       - name: Create Release
-        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: WordPress Symlink Manager v${{ steps.changelog.outputs.version }}
-          body: |
-            ## Changes
-            
-            ${{ steps.changelog.outputs.changelog }}
-            
-            ## Installation
-            
-            ```bash
-            # Clone the repository
-            git clone https://github.com/${{ github.repository }}.git
-            cd $(basename ${{ github.repository }})
-            
-            # Install dependencies
-            brew install jq
-            
-            # Run the interactive menu
-            ./wp-symlinks
-            ```
-            
-            ## Verification
-            
-            You can verify the release integrity by checking the commit hash:
-            ```
-            git log --oneline | head -5
-            ```
-          draft: false
-          prerelease: false
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "WordPress Symlink Manager ${{ github.ref_name }}" \
+            --notes "## Changes
+
+${{ steps.changelog.outputs.changelog }}
+
+## Installation
+
+\`\`\`bash
+# Clone the repository
+git clone https://github.com/${{ github.repository }}.git
+cd $(basename ${{ github.repository }})
+
+# Install dependencies
+brew install jq
+
+# Run the interactive menu
+./wp-symlinks
+\`\`\`
+
+## Verification
+
+You can verify the release integrity by checking the commit hash:
+\`\`\`
+git log --oneline | head -5
+\`\`\`
+
+---
+
+**Full Changelog**: https://github.com/${{ github.repository }}/compare/v2.1.0...${{ github.ref_name }}"

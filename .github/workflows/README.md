@@ -43,6 +43,14 @@ This directory contains automated workflows for the WordPress Symlink Manager re
   - Release notes generation
   - Installation instructions
 
+### 📦 **Release Automation** (`release-automation.yml`)
+- **Triggers**: Manual workflow dispatch
+- **Purpose**: Prepare releases with changelog updates
+- **Features**:
+  - Creates release branch
+  - Updates CHANGELOG.md template
+  - Opens PR for review
+
 ## Configuration Files
 
 - `markdown-link-check-config.json` - Link checker configuration
@@ -84,6 +92,60 @@ act -j shellcheck
 # Run all push triggers
 act push
 ```
+
+## Release Process
+
+### Creating a New Release
+
+1. **Start the release process**:
+   - Go to the [Actions tab](../../actions) on GitHub
+   - Click on "Release Automation" in the left sidebar
+   - Click "Run workflow"
+   - Enter the new version number (e.g., `2.1.2`)
+   - Select the release type (patch/minor/major)
+   - Click "Run workflow"
+
+2. **Update the changelog**:
+   - A PR will be created automatically with a CHANGELOG.md template
+   - Edit the PR to fill in the actual changes under the appropriate sections:
+     - `### Added` - for new features
+     - `### Changed` - for changes in existing functionality
+     - `### Fixed` - for bug fixes
+     - `### Removed` - for removed features
+   - Remove any empty sections
+   - Review and merge the PR
+
+3. **Create and push the tag**:
+   ```bash
+   # After merging the PR, pull the latest changes
+   git pull origin main
+   
+   # Create and push the tag (replace X.Y.Z with your version)
+   git tag -a vX.Y.Z -m "Release vX.Y.Z"
+   git push origin vX.Y.Z
+   ```
+
+4. **Automatic release creation**:
+   - The `release.yml` workflow will automatically:
+     - Extract the changelog for this version
+     - Create a GitHub release with the changelog
+     - Add installation instructions
+
+### Quick Release (for patch versions)
+
+For simple patch releases with just bug fixes:
+
+```bash
+# Make sure you're on main and up to date
+git checkout main
+git pull origin main
+
+# Tag and push (the release will be created automatically)
+git tag -a v2.1.2 -m "Fix: Brief description of fixes"
+git push origin v2.1.2
+```
+
+**Note**: Remember to update CHANGELOG.md manually after the release if you use the quick method.
 
 ## Maintenance
 
