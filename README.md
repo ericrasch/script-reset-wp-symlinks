@@ -23,6 +23,7 @@ This project provides powerful tools for automating symbolic link management bet
 ## **🚀 Quick Setup**
 
 ### **Super Simple - One Command Start:**
+
 ```bash
 # Clone or download this repository
 cd script-reset-wp-symlinks
@@ -35,12 +36,14 @@ brew install jq
 ```
 
 **That's it!** The interactive menu guides you through:
+
 1. ✅ Workspace setup
 2. ✅ Auto-configuration generation  
 3. ✅ Preview and execution
 4. ✅ Backup management
 
 ### **Advanced Direct Usage**
+
 ```bash
 # Set up workspace manually (skip interactive menu)
 ./scripts/setup-workspace.sh ~/Sites/scripts/wp-symlinks
@@ -56,7 +59,8 @@ cd ~/Sites/scripts/wp-symlinks
 ## **📁 What Gets Created**
 
 Your workspace will contain:
-```
+
+```text
 ~/Sites/scripts/wp-symlinks/
 ├── wp-symlinks                      # 🎯 MAIN ENTRY POINT (interactive menu)
 ├── generate-wp-symlinks.sh          # Core symlink generation script
@@ -84,6 +88,7 @@ Your workspace will contain:
 ## **🔄 How It Works**
 
 ### **Auto-Detection Process**
+
 1. **Reads LocalWP configuration** from `~/Library/Application Support/Local/sites.json`
 2. **Scans GitHub repositories** in `~/Sites/github/wp-*` directories
 3. **Smart matching** between LocalWP sites and GitHub repos
@@ -93,6 +98,7 @@ Your workspace will contain:
 7. **Validates and creates symlinks** with comprehensive error checking
 
 ### **What Gets Symlinked**
+
 - ✅ **Custom themes** (auto-detected in `wp-content/themes/`)
 - ✅ **Custom plugins** (excludes common WordPress plugins)
 - ✅ **Custom directories** (like `app_resources`, `lib`, etc.)
@@ -103,7 +109,9 @@ Your workspace will contain:
 ## **💡 Advanced Usage**
 
 ### **Auto-Generated Configuration**
+
 The setup automatically generates a personalized `symlink-config.json` based on your actual LocalWP sites and GitHub repositories. For special cases, you can customize it:
+
 ```json
 {
   "overrides": {
@@ -119,6 +127,7 @@ The setup automatically generates a personalized `symlink-config.json` based on 
 ```
 
 ### **Command Line Options**
+
 ```bash
 # Preview all changes without executing
 ./scripts/generate-wp-symlinks.sh --dry-run
@@ -137,6 +146,7 @@ The setup automatically generates a personalized `symlink-config.json` based on 
 ```
 
 ### **Configuration Management**
+
 ```bash
 # Re-generate configuration (when you add new sites)
 ./scripts/generate-config.sh
@@ -146,6 +156,7 @@ cat symlink-config.json
 ```
 
 ### **Backup Management**
+
 ```bash
 # View and restore backups interactively
 ./scripts/restore-from-backup.sh
@@ -153,7 +164,6 @@ cat symlink-config.json
 # Restore specific backup
 ./scripts/restore-from-backup.sh theme_20250626_143022
 ```
-
 
 ---
 
@@ -177,6 +187,7 @@ cat symlink-config.json
 ## **✨ Recent Enhancements (v2.1)**
 
 ### **Include/Exclude Plugin Control**
+
 The configuration now supports fine-grained control over which plugins are symlinked:
 
 ```json
@@ -193,10 +204,12 @@ The configuration now supports fine-grained control over which plugins are symli
 - Priority: Plugins in `include_plugins` override exclusion rules
 
 ### **Improved Script Naming**
+
 - Renamed `enhanced-reset_wp_symlinks.sh` → `generate-wp-symlinks.sh` for clarity
 - Better reflects the script's purpose of generating and managing symlinks
 
 ### **Better Error Handling**
+
 - Fixed JSON generation issues with proper stderr redirection
 - Cleaner configuration files without ANSI color codes
 - Improved validation and error messages
@@ -206,18 +219,21 @@ The configuration now supports fine-grained control over which plugins are symli
 ## **🆘 Troubleshooting**
 
 ### **Sites Not Detected**
+
 1. Ensure LocalWP sites exist in `~/Local Sites/`
 2. Verify GitHub repos are in `~/Sites/github/` with `wp-content` directories
 3. Use `--interactive` mode for manual selection
 4. Create custom mappings in `symlink-config.json`
 
 ### **Missing Dependencies**
+
 ```bash
 # Install jq for JSON parsing
 brew install jq
 ```
 
 ### **Backup Recovery**
+
 ```bash
 # List all available backups
 ./scripts/restore-from-backup.sh
@@ -250,6 +266,7 @@ This project is licensed under the **MIT License**. You are free to use, modify,
 ## **🎯 Ready to Get Started?**
 
 **Just two commands:**
+
 1. **Install dependency**: `brew install jq`
 2. **Run interactive menu**: `./wp-symlinks`
 
