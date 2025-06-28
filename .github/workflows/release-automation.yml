@@ -1,0 +1,94 @@
+name: Release Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 2.1.2)'
+        required: true
+        type: string
+      release_type:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  prepare-release:
+    name: Prepare Release
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Update CHANGELOG
+        run: |
+          # Get the current date
+          DATE=$(date +%Y-%m-%d)
+          VERSION="${{ inputs.version }}"
+          
+          # Create a placeholder for the new version entry
+          NEW_ENTRY="## [$VERSION] - $DATE
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- 
+
+### Removed
+
+- 
+
+"
+          
+          # Insert the new entry after the header
+          awk '/^## \[/ && !done {print "'"$NEW_ENTRY"'"; done=1} 1' CHANGELOG.md > CHANGELOG.tmp
+          mv CHANGELOG.tmp CHANGELOG.md
+          
+          echo "::notice::Please update CHANGELOG.md with the actual changes for version $VERSION"
+      
+      - name: Create Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="release/v${{ inputs.version }}"
+          git checkout -b "$BRANCH"
+          git add CHANGELOG.md
+          git commit -m "Prepare release v${{ inputs.version }}"
+          git push origin "$BRANCH"
+          
+          gh pr create \
+            --title "Release v${{ inputs.version }}" \
+            --body "## Release Checklist
+
+- [ ] Update CHANGELOG.md with all changes
+- [ ] Run all tests locally
+- [ ] Verify all GitHub Actions pass
+- [ ] Review documentation for accuracy
+
+## Version: v${{ inputs.version }}
+Type: ${{ inputs.release_type }}
+
+Once this PR is merged, the release will be created automatically via the tag push." \
+            --base main

@@ -1,12 +1,9 @@
 # **WordPress Symlink Manager for LocalWP**
 
-<!-- 
-GitHub Actions status badges (will be active after workflows are committed):
 [![ShellCheck](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/shellcheck.yml)
 [![Test Scripts](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/test-scripts.yml/badge.svg)](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/test-scripts.yml)
 [![Documentation Check](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/docs-check.yml/badge.svg)](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/docs-check.yml)
 [![Security Scan](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/security.yml/badge.svg)](https://github.com/ericrasch/script-reset-wp-symlinks/actions/workflows/security.yml)
--->
 
 ## **Overview**
 
@@ -68,7 +65,6 @@ Your workspace will contain:
 ├── symlink-config.json              # Your personalized configuration (auto-generated!)
 ├── backups/                         # Automatic backups directory
 ├── WORKSPACE-README.md              # Quick reference guide
-├── setup-aliases.sh                 # Optional shell aliases
 └── documentation files
 ```
 
