@@ -104,6 +104,11 @@ act push
    - Click "Run workflow"
    - Enter the new version number (e.g., `2.1.2`)
    - Select the release type (patch/minor/major)
+   - Choose changelog mode:
+     - **check_existing**: Use existing changelog entry (if exists) or create template
+     - **auto_generate**: Generate from git commits since last tag/base version
+     - **manual_template**: Always create empty template to fill manually
+   - Optionally specify base version for auto-generation (e.g., `v2.1.0`)
    - Click "Run workflow"
 
 2. **Create the Pull Request**:

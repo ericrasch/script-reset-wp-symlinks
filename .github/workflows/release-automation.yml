@@ -15,6 +15,19 @@ on:
           - patch
           - minor
           - major
+      changelog_mode:
+        description: 'Changelog generation mode'
+        required: true
+        type: choice
+        default: 'check_existing'
+        options:
+          - check_existing
+          - auto_generate
+          - manual_template
+      base_version:
+        description: 'Base version for auto-generation (e.g., v2.1.0)'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -34,75 +47,230 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       
-      - name: Update CHANGELOG
+      - name: Check if version exists
+        id: check_version
         run: |
-          # Get the current date
+          VERSION="${{ inputs.version }}"
+          if grep -q "^## \[$VERSION\]" CHANGELOG.md; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "::notice::Version $VERSION already exists in CHANGELOG.md"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "::notice::Version $VERSION does not exist in CHANGELOG.md"
+          fi
+      
+      - name: Generate changelog content
+        id: generate_changelog
+        run: |
+          VERSION="${{ inputs.version }}"
           DATE=$(date +%Y-%m-%d)
+          MODE="${{ inputs.changelog_mode }}"
+          
+          if [[ "${{ steps.check_version.outputs.exists }}" == "true" && "$MODE" == "check_existing" ]]; then
+            echo "::notice::Using existing changelog entry for version $VERSION"
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          echo "needs_update=true" >> $GITHUB_OUTPUT
+          
+          if [[ "$MODE" == "auto_generate" ]]; then
+            # Auto-generate from git commits
+            BASE_VERSION="${{ inputs.base_version }}"
+            if [[ -z "$BASE_VERSION" ]]; then
+              # Find the last version tag
+              BASE_VERSION=$(git tag --sort=-version:refname | grep "^v" | head -1)
+            fi
+            
+            if [[ -n "$BASE_VERSION" ]]; then
+              echo "::notice::Generating changelog from $BASE_VERSION to HEAD"
+              
+              # Get commits since base version
+              COMMITS=$(git log --pretty=format:"- %s" "${BASE_VERSION}..HEAD" --no-merges)
+              
+              # Categorize commits
+              ADDED=""
+              CHANGED=""
+              FIXED=""
+              REMOVED=""
+              OTHER=""
+              
+              while IFS= read -r commit; do
+                if [[ $commit =~ ^-\ (Add|add|NEW|new|FEAT|feat|Feature) ]]; then
+                  ADDED="$ADDED$commit"$'\n'
+                elif [[ $commit =~ ^-\ (Fix|fix|FIX|Bug|bug|BUG) ]]; then
+                  FIXED="$FIXED$commit"$'\n'
+                elif [[ $commit =~ ^-\ (Update|update|Change|change|Improve|improve|Refactor|refactor) ]]; then
+                  CHANGED="$CHANGED$commit"$'\n'
+                elif [[ $commit =~ ^-\ (Remove|remove|Delete|delete|Drop|drop) ]]; then
+                  REMOVED="$REMOVED$commit"$'\n'
+                else
+                  OTHER="$OTHER$commit"$'\n'
+                fi
+              done <<< "$COMMITS"
+              
+              # Create changelog entry
+              cat > changelog_entry.txt << ENTRY_EOF
+## [$VERSION] - $DATE
+
+ENTRY_EOF
+              
+              if [[ -n "$ADDED$OTHER" ]]; then
+                echo "" >> changelog_entry.txt
+                echo "### Added" >> changelog_entry.txt
+                echo "" >> changelog_entry.txt
+                [[ -n "$ADDED" ]] && echo "$ADDED" >> changelog_entry.txt
+                [[ -n "$OTHER" ]] && echo "$OTHER" >> changelog_entry.txt
+              fi
+              
+              if [[ -n "$CHANGED" ]]; then
+                echo "" >> changelog_entry.txt
+                echo "### Changed" >> changelog_entry.txt
+                echo "" >> changelog_entry.txt
+                echo "$CHANGED" >> changelog_entry.txt
+              fi
+              
+              if [[ -n "$FIXED" ]]; then
+                echo "" >> changelog_entry.txt
+                echo "### Fixed" >> changelog_entry.txt
+                echo "" >> changelog_entry.txt
+                echo "$FIXED" >> changelog_entry.txt
+              fi
+              
+              if [[ -n "$REMOVED" ]]; then
+                echo "" >> changelog_entry.txt
+                echo "### Removed" >> changelog_entry.txt
+                echo "" >> changelog_entry.txt
+                echo "$REMOVED" >> changelog_entry.txt
+              fi
+            else
+              echo "::warning::No base version found, creating manual template"
+              MODE="manual_template"
+            fi
+          fi
+          
+          if [[ "$MODE" == "manual_template" ]]; then
+            # Create manual template
+            cat > changelog_entry.txt << TEMPLATE_EOF
+## [$VERSION] - $DATE
+
+### Added
+
+- 
+
+### Changed
+
+- 
+
+### Fixed
+
+- 
+
+### Removed
+
+- 
+
+TEMPLATE_EOF
+          fi
+      
+      - name: Update CHANGELOG
+        if: steps.generate_changelog.outputs.needs_update == 'true'
+        run: |
           VERSION="${{ inputs.version }}"
           
-          # Create a placeholder for the new version entry
-          cat > changelog_template.txt << 'TEMPLATE_EOF'
-          ## [VERSION] - DATE
-
-          ### Added
-
-          - 
-
-          ### Changed
-
-          - 
-
-          ### Fixed
-
-          - 
-
-          ### Removed
-
-          - 
-
-          TEMPLATE_EOF
+          if [[ "${{ steps.check_version.outputs.exists }}" == "true" ]]; then
+            # Replace existing entry
+            echo "::notice::Replacing existing changelog entry for version $VERSION"
+            # Remove existing entry
+            sed -i "/^## \[$VERSION\]/,/^## \[/{ /^## \[/!d; }" CHANGELOG.md
+            # Insert new entry
+            awk '/^## \[/ && !done {system("cat changelog_entry.txt"); print ""; done=1} 1' CHANGELOG.md > CHANGELOG.tmp
+          else
+            # Insert new entry
+            echo "::notice::Adding new changelog entry for version $VERSION"
+            awk '/^## \[/ && !done {system("cat changelog_entry.txt"); print ""; done=1} 1' CHANGELOG.md > CHANGELOG.tmp
+          fi
           
-          # Replace placeholders
-          sed -i "s/VERSION/$VERSION/g" changelog_template.txt
-          sed -i "s/DATE/$DATE/g" changelog_template.txt
-          
-          # Insert the new entry after the header
-          awk '/^## \[/ && !done {system("cat changelog_template.txt"); done=1} 1' CHANGELOG.md > CHANGELOG.tmp
           mv CHANGELOG.tmp CHANGELOG.md
-          rm changelog_template.txt
-          
-          echo "::notice::Please update CHANGELOG.md with the actual changes for version $VERSION"
+          rm -f changelog_entry.txt
       
       - name: Create and Push Branch
         run: |
           BRANCH="release/v${{ inputs.version }}"
+          VERSION="${{ inputs.version }}"
+          
+          # Check if branch exists and delete it
+          if git show-ref --verify --quiet refs/remotes/origin/$BRANCH; then
+            echo "::notice::Branch $BRANCH already exists, deleting it"
+            git push origin --delete $BRANCH || true
+          fi
+          
           git checkout -b "$BRANCH"
-          git add CHANGELOG.md
-          git commit -m "Prepare release v${{ inputs.version }}"
+          
+          if [[ "${{ steps.generate_changelog.outputs.needs_update }}" == "true" ]]; then
+            git add CHANGELOG.md
+            git commit -m "Prepare release v$VERSION"
+          else
+            # Create empty commit to ensure branch exists
+            git commit --allow-empty -m "Prepare release v$VERSION (changelog already exists)"
+          fi
+          
           git push origin "$BRANCH"
           
-          # Create PR instructions
+          # Create comprehensive summary
           echo "## 🎉 Release branch created successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Release Type:** ${{ inputs.release_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Changelog Mode:** ${{ inputs.changelog_mode }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ steps.generate_changelog.outputs.needs_update }}" == "true" ]]; then
+            echo "### ✅ Changelog Updated" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            if [[ "${{ inputs.changelog_mode }}" == "auto_generate" ]]; then
+              echo "Automatically generated from git commits since ${{ inputs.base_version || 'last tag' }}." >> $GITHUB_STEP_SUMMARY
+            else
+              echo "Created template - please fill in the actual changes." >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "### ℹ️ Using Existing Changelog" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Version v${{ inputs.version }} already exists in CHANGELOG.md." >> $GITHUB_STEP_SUMMARY
+          fi
+          
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "1. **Create Pull Request**: [Click here to create PR](https://github.com/${{ github.repository }}/pull/new/release/v${{ inputs.version }})" >> $GITHUB_STEP_SUMMARY
+          echo "1. **[Create Pull Request](https://github.com/${{ github.repository }}/pull/new/release/v${{ inputs.version }})**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "2. **Update CHANGELOG.md** with the actual changes for v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "3. **PR Template** (copy this for your PR description):" >> $GITHUB_STEP_SUMMARY
-          echo '```markdown' >> $GITHUB_STEP_SUMMARY
-          echo "## Release Checklist" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- [ ] Update CHANGELOG.md with all changes" >> $GITHUB_STEP_SUMMARY
-          echo "- [ ] Run all tests locally" >> $GITHUB_STEP_SUMMARY
-          echo "- [ ] Verify all GitHub Actions pass" >> $GITHUB_STEP_SUMMARY
-          echo "- [ ] Review documentation for accuracy" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## Version: v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
-          echo "Type: ${{ inputs.release_type }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Once this PR is merged, the release will be created automatically via the tag push." >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ inputs.changelog_mode }}" == "manual_template" || "${{ steps.generate_changelog.outputs.needs_update }}" == "true" ]]; then
+            echo "2. **Review and update CHANGELOG.md** in the PR if needed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "3. **After merging PR, create and push tag:**" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "git pull origin main" >> $GITHUB_STEP_SUMMARY
+          echo "git tag -a v${{ inputs.version }} -m \"Release v${{ inputs.version }}\"" >> $GITHUB_STEP_SUMMARY
+          echo "git push origin v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           
-          echo "::notice::✅ Branch created! Click 'Summary' above for PR creation link and instructions."
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### PR Template:" >> $GITHUB_STEP_SUMMARY
+          echo '```markdown' >> $GITHUB_STEP_SUMMARY
+          echo "## Release v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Release Checklist" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Changelog reviewed and accurate" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] All tests pass" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Documentation updated if needed" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Ready for release" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Release Type:** ${{ inputs.release_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "After merging, the release will be created automatically when the tag is pushed." >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          
+          echo "::notice::✅ Branch created! Check the Summary tab for next steps."
