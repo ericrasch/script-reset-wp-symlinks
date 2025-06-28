@@ -79,63 +79,96 @@ jobs:
             BASE_VERSION="${{ inputs.base_version }}"
             if [[ -z "$BASE_VERSION" ]]; then
               # Find the last version tag
-              BASE_VERSION=$(git tag --sort=-version:refname | grep "^v" | head -1)
+              BASE_VERSION=$(git tag --sort=-version:refname | grep "^v" | head -1 || echo "")
+            fi
+            
+            # Add 'v' prefix if not present
+            if [[ -n "$BASE_VERSION" ]] && [[ ! "$BASE_VERSION" =~ ^v ]]; then
+              BASE_VERSION="v$BASE_VERSION"
             fi
             
             if [[ -n "$BASE_VERSION" ]]; then
-              echo "::notice::Generating changelog from $BASE_VERSION to HEAD"
+              # Check if the base version tag exists
+              if ! git rev-parse "$BASE_VERSION" >/dev/null 2>&1; then
+                echo "::warning::Base version tag '$BASE_VERSION' not found, creating manual template"
+                MODE="manual_template"
+              else
+                echo "::notice::Generating changelog from $BASE_VERSION to HEAD"
+                
+                # Debug: Show what tags exist
+                echo "::debug::Available tags: $(git tag --sort=-version:refname | grep '^v' | head -5 | tr '\n' ' ')"
+                
+                # Get commits since base version
+                COMMITS=$(git log --pretty=format:"- %s" "${BASE_VERSION}..HEAD" --no-merges 2>/dev/null || echo "")
+                
+                # Debug: Show number of commits found
+                COMMIT_COUNT=$(echo "$COMMITS" | grep -c "^-" || echo "0")
+                echo "::notice::Found $COMMIT_COUNT commits since $BASE_VERSION"
               
-              # Get commits since base version
-              COMMITS=$(git log --pretty=format:"- %s" "${BASE_VERSION}..HEAD" --no-merges)
-              
-              # Categorize commits
-              ADDED=""
-              CHANGED=""
-              FIXED=""
-              REMOVED=""
-              OTHER=""
-              
-              while IFS= read -r commit; do
-                if [[ $commit =~ ^-\ (Add|add|NEW|new|FEAT|feat|Feature) ]]; then
-                  ADDED="${ADDED}${commit}"$'\n'
-                elif [[ $commit =~ ^-\ (Fix|fix|FIX|Bug|bug|BUG) ]]; then
-                  FIXED="${FIXED}${commit}"$'\n'
-                elif [[ $commit =~ ^-\ (Update|update|Change|change|Improve|improve|Refactor|refactor) ]]; then
-                  CHANGED="${CHANGED}${commit}"$'\n'
-                elif [[ $commit =~ ^-\ (Remove|remove|Delete|delete|Drop|drop) ]]; then
-                  REMOVED="${REMOVED}${commit}"$'\n'
-                else
-                  OTHER="${OTHER}${commit}"$'\n'
+                # Categorize commits
+                ADDED=""
+                CHANGED=""
+                FIXED=""
+                REMOVED=""
+                OTHER=""
+                
+                if [[ -n "$COMMITS" ]]; then
+                  while IFS= read -r commit; do
+                    if [[ -n "$commit" ]]; then
+                      if [[ $commit =~ (Add|add|NEW|new|FEAT|feat|Feature) ]]; then
+                        ADDED="${ADDED}${commit}"$'\n'
+                      elif [[ $commit =~ (Fix|fix|FIX|Bug|bug|BUG) ]]; then
+                        FIXED="${FIXED}${commit}"$'\n'
+                      elif [[ $commit =~ (Update|update|Change|change|Improve|improve|Refactor|refactor) ]]; then
+                        CHANGED="${CHANGED}${commit}"$'\n'
+                      elif [[ $commit =~ (Remove|remove|Delete|delete|Drop|drop) ]]; then
+                        REMOVED="${REMOVED}${commit}"$'\n'
+                      else
+                        OTHER="${OTHER}${commit}"$'\n'
+                      fi
+                    fi
+                  done <<< "$COMMITS"
                 fi
-              done <<< "$COMMITS"
               
-              # Create changelog entry
-              echo "## [$VERSION] - $DATE" > changelog_entry.txt
-              echo "" >> changelog_entry.txt
-              
-              if [[ -n "$ADDED$OTHER" ]]; then
-                echo "### Added" >> changelog_entry.txt
+                # Create changelog entry
+                echo "## [$VERSION] - $DATE" > changelog_entry.txt
                 echo "" >> changelog_entry.txt
-                [[ -n "$ADDED" ]] && echo "$ADDED" >> changelog_entry.txt
-                [[ -n "$OTHER" ]] && echo "$OTHER" >> changelog_entry.txt
-              fi
-              
-              if [[ -n "$CHANGED" ]]; then
-                echo "### Changed" >> changelog_entry.txt
-                echo "" >> changelog_entry.txt
-                echo "$CHANGED" >> changelog_entry.txt
-              fi
-              
-              if [[ -n "$FIXED" ]]; then
-                echo "### Fixed" >> changelog_entry.txt
-                echo "" >> changelog_entry.txt
-                echo "$FIXED" >> changelog_entry.txt
-              fi
-              
-              if [[ -n "$REMOVED" ]]; then
-                echo "### Removed" >> changelog_entry.txt
-                echo "" >> changelog_entry.txt
-                echo "$REMOVED" >> changelog_entry.txt
+                
+                # Only add sections that have content
+                if [[ -n "$ADDED$OTHER" ]]; then
+                  echo "### Added" >> changelog_entry.txt
+                  echo "" >> changelog_entry.txt
+                  [[ -n "$ADDED" ]] && echo "$ADDED" >> changelog_entry.txt
+                  [[ -n "$OTHER" ]] && echo "$OTHER" >> changelog_entry.txt
+                  echo "" >> changelog_entry.txt
+                fi
+                
+                if [[ -n "$CHANGED" ]]; then
+                  echo "### Changed" >> changelog_entry.txt
+                  echo "" >> changelog_entry.txt
+                  echo "$CHANGED" >> changelog_entry.txt
+                  echo "" >> changelog_entry.txt
+                fi
+                
+                if [[ -n "$FIXED" ]]; then
+                  echo "### Fixed" >> changelog_entry.txt
+                  echo "" >> changelog_entry.txt
+                  echo "$FIXED" >> changelog_entry.txt
+                  echo "" >> changelog_entry.txt
+                fi
+                
+                if [[ -n "$REMOVED" ]]; then
+                  echo "### Removed" >> changelog_entry.txt
+                  echo "" >> changelog_entry.txt
+                  echo "$REMOVED" >> changelog_entry.txt
+                  echo "" >> changelog_entry.txt
+                fi
+                
+                # If no commits were found or categorized, create template
+                if [[ ! -s changelog_entry.txt || $(wc -l < changelog_entry.txt) -le 2 ]]; then
+                  echo "::notice::No commits found or all commits were empty, creating manual template"
+                  MODE="manual_template"
+                fi
               fi
             else
               echo "::warning::No base version found, creating manual template"
