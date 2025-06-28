@@ -36,37 +36,43 @@ jobs:
             echo "changelog=Release $VERSION" >> $GITHUB_OUTPUT
           fi
       
+      - name: Create release notes file
+        run: |
+          cat > release-notes.md << 'EOF'
+          ## Changes
+
+          ${{ steps.changelog.outputs.changelog }}
+
+          ## Installation
+
+          ```bash
+          # Clone the repository
+          git clone https://github.com/${{ github.repository }}.git
+          cd $(basename ${{ github.repository }})
+
+          # Install dependencies
+          brew install jq
+
+          # Run the interactive menu
+          ./wp-symlinks
+          ```
+
+          ## Verification
+
+          You can verify the release integrity by checking the commit hash:
+          ```
+          git log --oneline | head -5
+          ```
+
+          ---
+
+          **Full Changelog**: https://github.com/${{ github.repository }}/compare/v2.1.0...${{ github.ref_name }}
+          EOF
+      
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create "${{ github.ref_name }}" \
             --title "WordPress Symlink Manager ${{ github.ref_name }}" \
-            --notes "## Changes
-
-${{ steps.changelog.outputs.changelog }}
-
-## Installation
-
-\`\`\`bash
-# Clone the repository
-git clone https://github.com/${{ github.repository }}.git
-cd $(basename ${{ github.repository }})
-
-# Install dependencies
-brew install jq
-
-# Run the interactive menu
-./wp-symlinks
-\`\`\`
-
-## Verification
-
-You can verify the release integrity by checking the commit hash:
-\`\`\`
-git log --oneline | head -5
-\`\`\`
-
----
-
-**Full Changelog**: https://github.com/${{ github.repository }}/compare/v2.1.0...${{ github.ref_name }}"
+            --notes-file release-notes.md

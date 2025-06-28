@@ -42,7 +42,7 @@ jobs:
           VERSION="${{ inputs.version }}"
           
           # Create a placeholder for the new version entry
-          cat > changelog_template.txt << 'EOF'
+          cat > changelog_template.txt << 'TEMPLATE_EOF'
           ## [VERSION] - DATE
 
           ### Added
@@ -61,7 +61,7 @@ jobs:
 
           - 
 
-          EOF
+          TEMPLATE_EOF
           
           # Replace placeholders
           sed -i "s/VERSION/$VERSION/g" changelog_template.txt
@@ -84,9 +84,9 @@ jobs:
           git commit -m "Prepare release v${{ inputs.version }}"
           git push origin "$BRANCH"
           
-          gh pr create \
-            --title "Release v${{ inputs.version }}" \
-            --body "## Release Checklist
+          # Create PR body file
+          cat > pr-body.md << 'PR_EOF'
+          ## Release Checklist
 
           - [ ] Update CHANGELOG.md with all changes
           - [ ] Run all tests locally
@@ -96,5 +96,10 @@ jobs:
           ## Version: v${{ inputs.version }}
           Type: ${{ inputs.release_type }}
 
-          Once this PR is merged, the release will be created automatically via the tag push." \
+          Once this PR is merged, the release will be created automatically via the tag push.
+          PR_EOF
+          
+          gh pr create \
+            --title "Release v${{ inputs.version }}" \
+            --body-file pr-body.md \
             --base main
