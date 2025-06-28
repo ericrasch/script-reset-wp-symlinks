@@ -97,26 +97,23 @@ jobs:
               
               while IFS= read -r commit; do
                 if [[ $commit =~ ^-\ (Add|add|NEW|new|FEAT|feat|Feature) ]]; then
-                  ADDED="$ADDED$commit"$'\n'
+                  ADDED="${ADDED}${commit}"$'\n'
                 elif [[ $commit =~ ^-\ (Fix|fix|FIX|Bug|bug|BUG) ]]; then
-                  FIXED="$FIXED$commit"$'\n'
+                  FIXED="${FIXED}${commit}"$'\n'
                 elif [[ $commit =~ ^-\ (Update|update|Change|change|Improve|improve|Refactor|refactor) ]]; then
-                  CHANGED="$CHANGED$commit"$'\n'
+                  CHANGED="${CHANGED}${commit}"$'\n'
                 elif [[ $commit =~ ^-\ (Remove|remove|Delete|delete|Drop|drop) ]]; then
-                  REMOVED="$REMOVED$commit"$'\n'
+                  REMOVED="${REMOVED}${commit}"$'\n'
                 else
-                  OTHER="$OTHER$commit"$'\n'
+                  OTHER="${OTHER}${commit}"$'\n'
                 fi
               done <<< "$COMMITS"
               
               # Create changelog entry
-              cat > changelog_entry.txt << ENTRY_EOF
-## [$VERSION] - $DATE
-
-ENTRY_EOF
+              echo "## [$VERSION] - $DATE" > changelog_entry.txt
+              echo "" >> changelog_entry.txt
               
               if [[ -n "$ADDED$OTHER" ]]; then
-                echo "" >> changelog_entry.txt
                 echo "### Added" >> changelog_entry.txt
                 echo "" >> changelog_entry.txt
                 [[ -n "$ADDED" ]] && echo "$ADDED" >> changelog_entry.txt
@@ -124,21 +121,18 @@ ENTRY_EOF
               fi
               
               if [[ -n "$CHANGED" ]]; then
-                echo "" >> changelog_entry.txt
                 echo "### Changed" >> changelog_entry.txt
                 echo "" >> changelog_entry.txt
                 echo "$CHANGED" >> changelog_entry.txt
               fi
               
               if [[ -n "$FIXED" ]]; then
-                echo "" >> changelog_entry.txt
                 echo "### Fixed" >> changelog_entry.txt
                 echo "" >> changelog_entry.txt
                 echo "$FIXED" >> changelog_entry.txt
               fi
               
               if [[ -n "$REMOVED" ]]; then
-                echo "" >> changelog_entry.txt
                 echo "### Removed" >> changelog_entry.txt
                 echo "" >> changelog_entry.txt
                 echo "$REMOVED" >> changelog_entry.txt
@@ -149,28 +143,26 @@ ENTRY_EOF
             fi
           fi
           
-          if [[ "$MODE" == "manual_template" ]]; then
+          if [[ "$MODE" == "manual_template" || ( "$MODE" == "auto_generate" && ! -f changelog_entry.txt ) ]]; then
             # Create manual template
-            cat > changelog_entry.txt << TEMPLATE_EOF
-## [$VERSION] - $DATE
-
-### Added
-
-- 
-
-### Changed
-
-- 
-
-### Fixed
-
-- 
-
-### Removed
-
-- 
-
-TEMPLATE_EOF
+            echo "## [$VERSION] - $DATE" > changelog_entry.txt
+            echo "" >> changelog_entry.txt
+            echo "### Added" >> changelog_entry.txt
+            echo "" >> changelog_entry.txt
+            echo "- " >> changelog_entry.txt
+            echo "" >> changelog_entry.txt
+            echo "### Changed" >> changelog_entry.txt
+            echo "" >> changelog_entry.txt
+            echo "- " >> changelog_entry.txt
+            echo "" >> changelog_entry.txt
+            echo "### Fixed" >> changelog_entry.txt
+            echo "" >> changelog_entry.txt
+            echo "- " >> changelog_entry.txt
+            echo "" >> changelog_entry.txt
+            echo "### Removed" >> changelog_entry.txt
+            echo "" >> changelog_entry.txt
+            echo "- " >> changelog_entry.txt
+            echo "" >> changelog_entry.txt
           fi
       
       - name: Update CHANGELOG
