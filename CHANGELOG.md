@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.2] - 2025-06-28
+
+### Added
+
+- Enhance changelog generation by improving base version handling and adding checks for existing tags, ensuring more robust changelog entries.
+- Enhance release automation by adding changelog generation modes and updating CHANGELOG handling in workflows
+- Add release automation workflow and update release process documentation
+
+- Enhance release automation workflow by improving CHANGELOG entry creation and updating README for clarity and structure
+
+
+### Changed
+
+- Refactor changelog entry creation to improve formatting and streamline manual template generation
+- Improve release automation workflow by enhancing PR creation instructions and updating CHANGELOG guidance
+- Refactor release automation workflows to improve changelog and release notes generation
+- Update README to remove commented-out GitHub Actions badges and improve clarity
+
+
+
 ## [2.1.1] - 2025-06-28
 
 ### Fixed
