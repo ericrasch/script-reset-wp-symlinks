@@ -50,8 +50,8 @@ brew install jq
 
 # Navigate to workspace and run directly
 cd ~/Sites/scripts/wp-symlinks
-./generate-wp-symlinks.sh --dry-run
-./generate-wp-symlinks.sh
+./scripts/generate-wp-symlinks.sh --dry-run
+./scripts/generate-wp-symlinks.sh
 ```
 
 ---
@@ -125,19 +125,19 @@ The setup automatically generates a personalized `symlink-config.json` based on 
 ### **Command Line Options**
 ```bash
 # Preview all changes without executing
-./generate-wp-symlinks.sh --dry-run
+./scripts/generate-wp-symlinks.sh --dry-run
 
 # Interactive mode for ambiguous site matches
-./generate-wp-symlinks.sh --interactive
+./scripts/generate-wp-symlinks.sh --interactive
 
 # Use custom configuration file
-./generate-wp-symlinks.sh --config my-config.json
+./scripts/generate-wp-symlinks.sh --config my-config.json
 
 # Skip automatic backups
-./generate-wp-symlinks.sh --no-backup
+./scripts/generate-wp-symlinks.sh --no-backup
 
 # Enable verbose output
-./generate-wp-symlinks.sh --verbose
+./scripts/generate-wp-symlinks.sh --verbose
 ```
 
 ### **Configuration Management**
@@ -152,24 +152,12 @@ cat symlink-config.json
 ### **Backup Management**
 ```bash
 # View and restore backups interactively
-./restore-from-backup.sh
+./scripts/restore-from-backup.sh
 
 # Restore specific backup
-./restore-from-backup.sh theme_20250626_143022
+./scripts/restore-from-backup.sh theme_20250626_143022
 ```
 
-### **Convenient Aliases (Optional)**
-```bash
-# Add to your shell profile
-./setup-aliases.sh >> ~/.bashrc
-source ~/.bashrc
-
-# Then use:
-wp-symlinks     # Navigate to workspace
-wp-sync-dry     # Dry run
-wp-sync         # Execute
-wp-restore      # Restore backups
-```
 
 ---
 
@@ -236,7 +224,7 @@ brew install jq
 ### **Backup Recovery**
 ```bash
 # List all available backups
-./restore-from-backup.sh
+./scripts/restore-from-backup.sh
 
 # Follow interactive prompts to restore
 ```
